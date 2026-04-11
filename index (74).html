@@ -1,0 +1,3379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proctor Compaction Reports | Modified & Standard ASTM D1557 / D698</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+  /* ============================================================
+     UTILITY CSS — replacing Tailwind CDN (no CDN dependency)
+  ============================================================ */
+  .flex { display:flex; }
+  .flex-wrap { flex-wrap:wrap; }
+  .flex-col { flex-direction:column; }
+  .items-center { align-items:center; }
+  .justify-between { justify-content:space-between; }
+  .gap-1 { gap:4px; }
+  .gap-2 { gap:8px; }
+  .gap-3 { gap:12px; }
+  .grid { display:grid; }
+  .grid-cols-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .hidden { display:none !important; }
+  .block { display:block; }
+  .w-px { width:1px; }
+  .self-stretch { align-self:stretch; }
+  .mx-1 { margin-left:4px; margin-right:4px; }
+  .mx-auto { margin-left:auto; margin-right:auto; }
+  .mb-0 { margin-bottom:0; }
+  .mb-3 { margin-bottom:12px; }
+  .mb-4 { margin-bottom:16px; }
+  .mr-2 { margin-right:8px; }
+  .mt-3 { margin-top:12px; }
+  .px-4 { padding-left:16px; padding-right:16px; }
+  .py-2 { padding-top:8px; padding-bottom:8px; }
+  .py-3 { padding-top:12px; padding-bottom:12px; }
+  .py-4 { padding-top:16px; padding-bottom:16px; }
+  .py-6 { padding-top:24px; padding-bottom:24px; }
+  .p-2 { padding:8px; }
+  .p-3 { padding:12px; }
+  .px-3 { padding-left:12px; padding-right:12px; }
+  .py-1 { padding-top:4px; padding-bottom:4px; }
+  .max-w-screen-2xl { max-width:1536px; }
+  .shadow-lg { box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05); }
+  .shadow-sm { box-shadow:0 1px 2px 0 rgba(0,0,0,0.05); }
+  .border { border-width:1px; border-style:solid; }
+  .border-b { border-bottom-width:1px; border-bottom-style:solid; }
+  .border-2 { border-width:2px; border-style:solid; }
+  .rounded { border-radius:4px; }
+  .rounded-t { border-radius:4px 4px 0 0; }
+  .rounded-lg { border-radius:8px; }
+  .font-bold { font-weight:700; }
+  .font-semibold { font-weight:600; }
+  .font-medium { font-weight:500; }
+  .text-sm { font-size:14px; }
+  .text-xs { font-size:12px; }
+  .leading-tight { line-height:1.25; }
+  .text-white { color:#fff; }
+  .text-gray-500 { color:#6b7280; }
+  .text-purple-600 { color:#7c3aed; }
+  .text-amber-800 { color:#92400e; }
+  .bg-white { background:#fff; }
+  .bg-gray-300 { background:#d1d5db; }
+  .bg-purple-50 { background:#f5f3ff; }
+  .bg-amber-50 { background:#fffbeb; }
+  .border-gray-200 { border-color:#e5e7eb; }
+  .border-gray-300 { border-color:#d1d5db; }
+  .border-purple-200 { border-color:#ddd6fe; }
+  .border-purple-400 { border-color:#a78bfa; }
+  .border-amber-300 { border-color:#fcd34d; }
+  .text-blue-200 { color:#bfdbfe; }
+  @media (min-width:768px) {
+    .md\:grid-cols-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .md\:grid-cols-5 { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  }
+  /* gradient header */
+  .bg-gradient-to-r.from-blue-900.to-purple-700 {
+    background: linear-gradient(to right,#1e3a5f,#7c3aed);
+  }
+
+  /* ============================================================
+     DARK MODE
+  ============================================================ */
+  body.dark-mode {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+  }
+  body.dark-mode .card { background:#1e293b !important; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
+  body.dark-mode .card-header { background:#1e3a5f !important; }
+  body.dark-mode .card-header-std { background:#5b21b6 !important; }
+  body.dark-mode .card-body { background:#1e293b !important; }
+  body.dark-mode .form-control {
+    background:#0f172a !important; color:#e2e8f0 !important;
+    border-color:#334155 !important;
+  }
+  body.dark-mode .form-label { color:#94a3b8 !important; }
+  body.dark-mode #tabNav { background:#1e293b !important; border-color:#334155 !important; }
+  body.dark-mode .tab-btn { color:#94a3b8 !important; border-color:#334155 !important; background:#0f172a !important; }
+  body.dark-mode .tab-btn.active { background:#1e3a5f !important; color:#fff !important; }
+  body.dark-mode .tab-btn.active-std { background:#7c3aed !important; color:#fff !important; }
+  body.dark-mode .data-table td { border-color:#334155 !important; }
+  body.dark-mode .data-table td input { color:#e2e8f0 !important; }
+  body.dark-mode .data-table tr:nth-child(even) td { background:#1e293b !important; }
+  body.dark-mode .data-table tr:hover td { background:#1e3a5f !important; }
+  body.dark-mode .data-table td input[readonly] { background:#0f172a !important; color:#64748b !important; }
+  body.dark-mode .bg-white { background:#1e293b !important; }
+  body.dark-mode .bg-gray-300 { background:#334155 !important; }
+  body.dark-mode .bg-purple-50 { background:#1e1b4b !important; }
+  body.dark-mode .bg-amber-50 { background:#1c1008 !important; }
+  body.dark-mode select.form-control option { background:#1e293b; color:#e2e8f0; }
+  body.dark-mode #reportContainer,
+  body.dark-mode #reportContainerStd {
+    background:#fff !important; color:#111 !important;
+  }
+
+  /* ============================================================
+     DATA LOCK MODE
+  ============================================================ */
+  body.data-locked input:not([readonly]),
+  body.data-locked select,
+  body.data-locked textarea {
+    pointer-events: none !important;
+    opacity: 0.75 !important;
+    background: #f8fafc !important;
+    cursor: not-allowed !important;
+  }
+  body.dark-mode.data-locked input:not([readonly]),
+  body.dark-mode.data-locked select,
+  body.dark-mode.data-locked textarea {
+    background: #0f172a !important;
+  }
+  .lock-indicator {
+    display: none;
+    background: #dc2626;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    animation: pulse-lock 2s infinite;
+  }
+  body.data-locked .lock-indicator { display:inline-block; }
+  @keyframes pulse-lock {
+    0%,100% { opacity:1; }
+    50% { opacity:0.6; }
+  }
+
+  /* ============================================================
+     SMART PRINT SYSTEM
+  ============================================================ */
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; }
+
+  .rtl { direction: rtl; text-align: right; }
+  .ltr { direction: ltr; text-align: left; }
+
+  /* Tab styles */
+  .tab-btn { transition: all 0.2s; }
+  .tab-btn.active { background: #1e3a5f; color: #fff; border-color: #1e3a5f; }
+  .tab-btn.active-std { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Card styles */
+  .card { background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:16px; }
+  .card-header { background: #1e3a5f; color:#fff; padding:10px 16px; border-radius:8px 8px 0 0; font-weight:700; font-size:14px; }
+  .card-header-std { background: #7c3aed; color:#fff; padding:10px 16px; border-radius:8px 8px 0 0; font-weight:700; font-size:14px; }
+  .card-body { padding:16px; }
+
+  /* Input table */
+  .data-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .data-table th { background:#1e3a5f; color:#fff; padding:6px 8px; border:1px solid #2d5a8e; white-space:nowrap; text-align:center; font-size:11px; }
+  .data-table-std th { background:#7c3aed !important; border-color:#5b21b6 !important; }
+  .data-table td { border:1px solid #d1d5db; padding:2px; text-align:center; }
+  .data-table td input { width:100%; border:none; padding:4px 4px; text-align:center; font-size:11px; background:transparent; }
+  .data-table td input:focus { outline:2px solid #3b82f6; background:#eff6ff; border-radius:2px; }
+  .data-table td input[readonly] { background:#f3f4f6; color:#6b7280; cursor:not-allowed; }
+  .data-table tr:nth-child(even) td { background:#f9fafb; }
+  .data-table tr:hover td { background:#eff6ff; }
+  .data-table tr:nth-child(even) td input[readonly] { background:#f3f4f6; }
+
+  /* Form fields */
+  .form-group { margin-bottom:12px; }
+  .form-label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; }
+  .form-control { width:100%; border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-size:13px; transition:border 0.2s; }
+  .form-control:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
+  select.form-control { cursor:pointer; }
+
+  /* Buttons */
+  .btn { padding:8px 16px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
+  .btn-primary { background:#1e3a5f; color:#fff; }
+  .btn-primary:hover { background:#16304f; }
+  .btn-std { background:#7c3aed; color:#fff; }
+  .btn-std:hover { background:#6d28d9; }
+  .btn-success { background:#059669; color:#fff; }
+  .btn-success:hover { background:#047857; }
+  .btn-warning { background:#d97706; color:#fff; }
+  .btn-warning:hover { background:#b45309; }
+  .btn-danger { background:#dc2626; color:#fff; }
+  .btn-danger:hover { background:#b91c1c; }
+  .btn-info { background:#0284c7; color:#fff; }
+  .btn-info:hover { background:#0369a1; }
+  .btn-outline { background:#fff; color:#374151; border:1px solid #d1d5db; }
+  .btn-outline:hover { background:#f3f4f6; }
+
+  /* Language switcher */
+  .lang-btn { padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; border:2px solid #1e3a5f; transition:all 0.2s; }
+  .lang-btn.active { background:#1e3a5f; color:#fff; }
+  .lang-btn:not(.active) { background:#fff; color:#1e3a5f; }
+
+  /* Checkbox group */
+  .checkbox-group { display:flex; align-items:center; gap:8px; }
+  .checkbox-group input[type=checkbox] { width:16px; height:16px; cursor:pointer; }
+
+  /* Standard Proctor badge */
+  .std-badge {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .mod-badge {
+    background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============================================================
+     FINAL REPORT STYLES — MODIFIED PROCTOR
+  ============================================================ */
+  #reportContainer {
+    background: #fff;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 12mm 14mm;
+    font-family: 'Times New Roman', serif;
+    font-size: 10pt;
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* ============================================================
+     FINAL REPORT STYLES — STANDARD PROCTOR
+  ============================================================ */
+  #reportContainerStd {
+    background: #fff;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 12mm 14mm;
+    font-family: 'Times New Roman', serif;
+    font-size: 10pt;
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* Shared report component styles */
+  .rpt-header { border:2px solid #000; margin-bottom:6px; }
+  .rpt-dev-strip {
+    background: linear-gradient(90deg, #1e3a5f 0%, #2d5a8e 50%, #7c3aed 100%);
+    color: #fff;
+    text-align: center;
+    padding: 5px 10px;
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+  .rpt-dev-strip span { opacity: 0.85; font-weight: 400; font-size: 7.5pt; margin: 0 8px; }
+  .rpt-header-top { display:flex; align-items:stretch; border-bottom:1px solid #000; }
+  .rpt-logo-box { width:90px; border-right:1px solid #000; display:flex; align-items:center; justify-content:center; padding:8px; background:#f8fafc; }
+  .rpt-logo-box svg { width:68px; height:58px; }
+  .rpt-title-box { flex:1; text-align:center; padding:10px 14px; display:flex; flex-direction:column; justify-content:center; }
+  .rpt-title-box h1 { font-size:14pt; font-weight:900; margin:0 0 4px 0; letter-spacing:0.5px; text-transform:uppercase; color:#1e3a5f; }
+  .rpt-title-box h2 { font-size:9.5pt; font-weight:700; margin:0; color:#444; }
+  .rpt-std-box { width:120px; border-left:1px solid #000; padding:8px; text-align:center; font-size:7.5pt; font-weight:700; background:#f8fafc; display:flex; flex-direction:column; justify-content:center; }
+  .rpt-header-info { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; }
+  .rpt-info-cell { padding:4px 8px; border-right:1px solid #000; font-size:8.5pt; }
+  .rpt-info-cell:last-child { border-right:none; }
+  .rpt-info-label { font-weight:700; font-size:7.5pt; color:#555; }
+  .rpt-info-val { font-weight:600; color:#111; }
+  .rpt-info-label { font-weight:700; color:#000; }
+  .rpt-info-val { color:#000; }
+
+  /* Section headings — Modified (blue) */
+  .rpt-section-title {
+    background: #1e3a5f;
+    color: #fff;
+    font-size: 8.5pt;
+    font-weight: 700;
+    padding: 3px 8px;
+    margin: 5px 0 4px 0;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Section headings — Standard (purple) */
+  .rpt-section-title-std {
+    background: #7c3aed;
+    color: #fff;
+    font-size: 8.5pt;
+    font-weight: 700;
+    padding: 3px 8px;
+    margin: 5px 0 4px 0;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Info grids */
+  .rpt-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid #aaa; margin-bottom:4px; }
+  .rpt-info-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border:1px solid #aaa; margin-bottom:4px; }
+  .rpt-field { display:flex; border-bottom:1px solid #ddd; border-right:1px solid #ddd; }
+  .rpt-field:nth-child(2n) { border-right:none; }
+  .rpt-field-lbl { font-weight:700; font-size:8pt; padding:2px 6px; background:#f5f5f5; min-width:120px; border-right:1px solid #ddd; white-space:nowrap; }
+  .rpt-field-val { font-size:8pt; padding:2px 6px; flex:1; }
+  .rpt-field-3 { display:flex; border-bottom:1px solid #ddd; border-right:1px solid #ddd; }
+  .rpt-field-3:nth-child(3n) { border-right:none; }
+  .rpt-field-3-lbl { font-weight:700; font-size:8pt; padding:2px 5px; background:#f5f5f5; border-right:1px solid #ddd; white-space:nowrap; min-width:90px; }
+  .rpt-field-3-val { font-size:8pt; padding:2px 5px; flex:1; }
+
+  /* Tables — Modified (blue header) */
+  .rpt-table { width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:4px; }
+  .rpt-table th { background:#1e3a5f; color:#fff; padding:3px 4px; border:1px solid #555; text-align:center; font-size:7.5pt; white-space:nowrap; }
+  .rpt-table td { border:1px solid #aaa; padding:2px 4px; text-align:center; font-size:7.5pt; }
+  .rpt-table tr:nth-child(even) td { background:#f9fafb; }
+
+  /* Tables — Standard (purple header) */
+  .rpt-table-std { width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:4px; }
+  .rpt-table-std th { background:#7c3aed; color:#fff; padding:3px 4px; border:1px solid #555; text-align:center; font-size:7.5pt; white-space:nowrap; }
+  .rpt-table-std td { border:1px solid #aaa; padding:2px 4px; text-align:center; font-size:7.5pt; }
+  .rpt-table-std tr:nth-child(even) td { background:#faf5ff; }
+
+  /* Moisture tables */
+  .rpt-moist-table { width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:4px; }
+  .rpt-moist-table th { background:#2d5a8e; color:#fff; padding:3px 4px; border:1px solid #555; text-align:center; font-size:7.5pt; }
+  .rpt-moist-table td { border:1px solid #aaa; padding:2px 4px; text-align:center; font-size:7.5pt; }
+  .rpt-moist-table tr:nth-child(even) td { background:#f9fafb; }
+
+  .rpt-moist-table-std { width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:4px; }
+  .rpt-moist-table-std th { background:#6d28d9; color:#fff; padding:3px 4px; border:1px solid #555; text-align:center; font-size:7.5pt; }
+  .rpt-moist-table-std td { border:1px solid #aaa; padding:2px 4px; text-align:center; font-size:7.5pt; }
+  .rpt-moist-table-std tr:nth-child(even) td { background:#faf5ff; }
+
+  /* Summary box — Modified */
+  .rpt-summary { border:2px solid #1e3a5f; margin-bottom:4px; }
+  .rpt-summary-header { background:#1e3a5f; color:#fff; font-weight:700; padding:3px 8px; font-size:9pt; text-transform:uppercase; }
+  .rpt-summary-body { padding:6px 8px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+  .rpt-summary-item { text-align:center; padding:4px; border:1px solid #ddd; border-radius:4px; }
+  .rpt-summary-label { font-size:7.5pt; font-weight:700; color:#555; }
+  .rpt-summary-value { font-size:13pt; font-weight:900; color:#1e3a5f; }
+  .rpt-summary-unit { font-size:7pt; color:#777; }
+
+  /* Summary box — Standard */
+  .rpt-summary-std { border:2px solid #7c3aed; margin-bottom:4px; }
+  .rpt-summary-header-std { background:#7c3aed; color:#fff; font-weight:700; padding:3px 8px; font-size:9pt; text-transform:uppercase; }
+  .rpt-summary-body-std { padding:6px 8px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+  .rpt-summary-item-std { text-align:center; padding:4px; border:1px solid #e9d5ff; border-radius:4px; background:#faf5ff; }
+  .rpt-summary-label-std { font-size:7.5pt; font-weight:700; color:#5b21b6; }
+  .rpt-summary-value-std { font-size:13pt; font-weight:900; color:#7c3aed; }
+  .rpt-summary-unit-std { font-size:7pt; color:#777; }
+
+  /* Chart container */
+  .rpt-chart-container { border:1px solid #aaa; padding:4px; margin-bottom:4px; height:220px; position:relative; }
+  .rpt-chart-container canvas { max-height:210px; }
+
+  /* Signature block */
+  .rpt-signature {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:0; border:1.5px solid #aaa; margin-bottom:4px;
+  }
+  .rpt-sig-col {
+    padding: 8px 12px;
+    border-right: 1px solid #aaa;
+  }
+  .rpt-sig-col:last-child { border-right: none; }
+  .rpt-sig-col-header {
+    font-size: 7.5pt; font-weight: 800; color: #1e3a5f;
+    text-transform: uppercase; letter-spacing: 0.3px;
+    border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px;
+  }
+  .rpt-sig-col-header-std { color: #7c3aed; }
+  .rpt-sig-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-bottom: 6px;
+  }
+  .rpt-sig-item { text-align:center; }
+  .rpt-sig-line { border-bottom:1.5px solid #555; margin-bottom:3px; height:32px; }
+  .rpt-sig-label { font-size:7.5pt; font-weight:700; color:#333; }
+  .rpt-sig-name { font-size:8pt; color:#111; font-weight:600; margin-top:2px; min-height:14px; }
+  .rpt-sig-date { font-size:7pt; color:#666; margin-top:1px; }
+
+  /* Remarks */
+  .rpt-remarks { border:1px solid #aaa; padding:4px 8px; margin-bottom:4px; min-height:32px; font-size:8pt; }
+
+  /* Footer */
+  .rpt-footer { display:flex; justify-content:space-between; border-top:1px solid #aaa; padding-top:3px; font-size:7pt; color:#555; }
+
+  /* Env conditions */
+  .rpt-env { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; border:1px solid #aaa; margin-bottom:4px; }
+  .rpt-env-cell { padding:3px 6px; border-right:1px solid #ddd; font-size:8pt; }
+  .rpt-env-cell:last-child { border-right:none; }
+  .rpt-env-lbl { font-weight:700; font-size:7.5pt; color:#444; }
+  .rpt-env-val { font-size:8.5pt; }
+
+  /* Comparison difference indicator */
+  .diff-better { color: #059669; font-weight: 700; }
+  .diff-worse  { color: #dc2626; font-weight: 700; }
+
+  /* ============================================================
+     SETTINGS PANEL
+  ============================================================ */
+  .settings-wrapper { position: relative; }
+  .settings-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    min-width: 260px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: panelIn 0.18s ease;
+  }
+  @keyframes panelIn {
+    from { opacity:0; transform:translateY(-8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .settings-panel.open { display: block; }
+  .settings-panel-header {
+    background: linear-gradient(135deg,#1e3a5f,#7c3aed);
+    color:#fff; padding:10px 14px; font-weight:700; font-size:13px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .settings-section { padding:8px 0; border-bottom:1px solid #f0f0f0; }
+  .settings-section:last-child { border-bottom:none; }
+  .settings-section-label {
+    font-size:10px; font-weight:700; color:#9ca3af;
+    text-transform:uppercase; letter-spacing:.5px;
+    padding:2px 14px 4px;
+  }
+  .settings-item {
+    display:flex; align-items:center; gap:10px;
+    padding:7px 14px; cursor:pointer; transition:background .15s;
+    font-size:13px; color:#374151; text-decoration:none; width:100%; border:none; background:none; text-align:right;
+  }
+  .settings-item:hover { background:#f3f4f6; }
+  .settings-item .si-icon { font-size:16px; width:22px; text-align:center; flex-shrink:0; }
+  .settings-item .si-label { flex:1; }
+  .settings-item .si-badge {
+    font-size:10px; background:#e5e7eb; color:#6b7280; padding:1px 7px; border-radius:20px;
+  }
+  .settings-item.si-active .si-badge { background:#dcfce7; color:#059669; }
+  .settings-item.si-danger:hover { background:#fef2f2; color:#dc2626; }
+  body.dark-mode .settings-panel { background:#1e293b; border-color:#334155; }
+  body.dark-mode .settings-item { color:#e2e8f0; }
+  body.dark-mode .settings-item:hover { background:#0f172a; }
+  body.dark-mode .settings-section { border-color:#334155; }
+  body.dark-mode .settings-item .si-badge { background:#334155; color:#94a3b8; }
+
+  /* ============================================================
+     PRINT STYLES
+  ============================================================ */
+  @media print {
+    /* === PAGE SETUP === */
+    @page { size: A4 portrait; margin: 8mm 10mm; }
+
+    /* === HIDE EVERYTHING EXCEPT TARGET === */
+    body > *:not(.print-target) { display: none !important; }
+    .print-target {
+      display: block !important;
+      position: static !important;
+      width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      visibility: visible !important;
+    }
+    .print-target * { visibility: visible !important; }
+
+    /* === REPORT CONTAINER === */
+    #reportContainer,
+    #reportContainerStd {
+      box-shadow: none !important;
+      margin: 0 auto !important;
+      padding: 4mm 6mm !important;
+      max-width: 190mm !important;
+      font-size: 8pt !important;
+      background: #fff !important;
+      color: #000 !important;
+      width: 190mm !important;
+    }
+
+    /* === COLOR PRESERVATION === */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    /* === TABLE COMPRESSION === */
+    .rpt-table th, .rpt-table td,
+    .rpt-table-std th, .rpt-table-std td,
+    .rpt-moist-table th, .rpt-moist-table td,
+    .rpt-moist-table-std th, .rpt-moist-table-std td {
+      font-size: 6.5pt !important;
+      padding: 1px 2px !important;
+    }
+
+    /* === FIELD LABELS === */
+    .rpt-field-lbl, .rpt-field-val,
+    .rpt-field-3-lbl, .rpt-field-3-val {
+      font-size: 7pt !important;
+      padding: 1px 3px !important;
+    }
+    .rpt-env-lbl, .rpt-env-val { font-size: 7pt !important; padding: 2px 4px !important; }
+
+    /* === SECTION TITLES === */
+    .rpt-section-title, .rpt-section-title-std {
+      padding: 2px 5px !important;
+      font-size: 7.5pt !important;
+      margin-top: 3px !important;
+    }
+
+    /* === CHART === */
+    .rpt-chart-container { height: 165px !important; page-break-inside: avoid !important; }
+    canvas { max-width: 100% !important; }
+
+    /* === SUMMARY BOX === */
+    .rpt-summary-value { font-size: 10pt !important; }
+    .rpt-summary-value-std { font-size: 10pt !important; }
+    .rpt-summary-label, .rpt-summary-label-std { font-size: 6.5pt !important; }
+    .rpt-summary-unit, .rpt-summary-unit-std { font-size: 6pt !important; }
+    .rpt-summary-item, .rpt-summary-item-std { padding: 3px 2px !important; }
+
+    /* === PAGE BREAK CONTROL === */
+    .rpt-section-title, .rpt-section-title-std,
+    .rpt-table, .rpt-moist-table,
+    .rpt-signature, .rpt-summary, .rpt-summary-std,
+    .rpt-env, .rpt-info-grid, .rpt-header,
+    .rpt-remarks, .rpt-footer {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    /* === HEADER === */
+    .rpt-header { padding: 0 !important; margin-bottom: 3px !important; }
+    .rpt-dev-strip { font-size: 7pt !important; padding: 3px 6px !important; }
+    .rpt-dev-strip span { font-size: 6.5pt !important; }
+    .rpt-logo-title { font-size: 10pt !important; }
+    .rpt-logo-sub { font-size: 7pt !important; }
+    .rpt-title-box { padding: 6px 10px !important; }
+    .rpt-title-box h1 { font-size: 11pt !important; margin-bottom: 2px !important; }
+    .rpt-title-box h2 { font-size: 8pt !important; }
+    .rpt-logo-box { width: 75px !important; padding: 5px !important; }
+    .rpt-std-box { width: 100px !important; padding: 5px !important; }
+    .rpt-header-info { font-size: 7pt !important; }
+    .rpt-info-cell { padding: 2px 6px !important; }
+
+    /* === SIGNATURES — always visible === */
+    .rpt-signature {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      margin-top: 4px !important;
+    }
+    .rpt-sig-col { padding: 5px 8px !important; }
+    .rpt-sig-col-header { font-size: 7pt !important; padding-bottom: 3px !important; margin-bottom: 4px !important; }
+    .rpt-sig-row { grid-template-columns: 1fr 1fr !important; gap: 6px !important; }
+    .rpt-sig-line { height: 22px !important; }
+    .rpt-sig-label { font-size: 6.5pt !important; }
+    .rpt-sig-name { font-size: 7pt !important; color: #000 !important; }
+    .rpt-sig-date { font-size: 6pt !important; }
+
+    /* === FOOTER — always visible === */
+    .rpt-footer {
+      display: flex !important;
+      justify-content: space-between !important;
+      font-size: 6pt !important;
+      padding: 2px 0 !important;
+      margin-top: 3px !important;
+      border-top: 1px solid #aaa !important;
+      color: #333 !important;
+    }
+
+    /* === REMARKS === */
+    .rpt-remarks { min-height: 20px !important; font-size: 7pt !important; padding: 2px 4px !important; }
+  }
+</style>
+</head>
+<body class="rtl">
+
+<!-- ============================================================
+     APP HEADER
+============================================================ -->
+<div id="appHeader" class="bg-gradient-to-r from-blue-900 to-purple-700 text-white shadow-lg">
+  <div class="max-w-screen-2xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+    <div class="flex items-center gap-3">
+      <svg viewBox="0 0 40 40" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="8" fill="#fff" fill-opacity="0.15"/>
+        <path d="M8 30 Q20 10 32 30" stroke="#fff" stroke-width="2.5" fill="none"/>
+        <circle cx="12" cy="26" r="2.5" fill="#fbbf24"/>
+        <circle cx="20" cy="14" r="2.5" fill="#fbbf24"/>
+        <circle cx="28" cy="26" r="2.5" fill="#fbbf24"/>
+        <line x1="6" y1="30" x2="34" y2="30" stroke="#fff" stroke-width="1.5"/>
+        <line x1="8" y1="32" x2="8" y2="10" stroke="#fff" stroke-width="1.5"/>
+      </svg>
+      <div>
+        <div id="appTitle" class="font-bold text-sm leading-tight">منصة اختبار دمك بروكتور</div>
+        <div class="text-xs text-blue-200">Modified (ASTM D1557) &amp; Standard (ASTM D698) Proctor Compaction</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="lang-btn active" id="btnAR" onclick="switchLang('ar')">AR</button>
+      <button class="lang-btn" id="btnEN" onclick="switchLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB NAVIGATION
+============================================================ -->
+<div id="tabNav" class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-screen-2xl mx-auto px-4 flex items-center justify-between flex-wrap gap-2 py-2">
+    <div class="flex gap-2 flex-wrap">
+      <!-- Modified Proctor Tabs -->
+      <div class="flex gap-1 items-center">
+        <span class="mod-badge">MOD</span>
+        <button id="tab1Btn" class="tab-btn active px-4 py-2 rounded-t border-2 border-gray-300 font-semibold text-sm" onclick="switchMainTab('modified','dataEntry')" data-i18n="tab_data_entry">إدخال البيانات</button>
+        <button id="tab2Btn" class="tab-btn px-4 py-2 rounded-t border-2 border-gray-300 font-semibold text-sm" onclick="switchMainTab('modified','finalReport')" data-i18n="tab_final_report">التقرير النهائي</button>
+      </div>
+      <div class="w-px bg-gray-300 mx-1 self-stretch"></div>
+      <!-- Standard Proctor Tabs -->
+      <div class="flex gap-1 items-center">
+        <span class="std-badge">STD</span>
+        <button id="tab3Btn" class="tab-btn px-4 py-2 rounded-t border-2 border-gray-300 font-semibold text-sm" onclick="switchMainTab('standard','dataEntry')" data-i18n="tab_std_entry">إدخال بيانات القياسي</button>
+        <button id="tab4Btn" class="tab-btn px-4 py-2 rounded-t border-2 border-gray-300 font-semibold text-sm" onclick="switchMainTab('standard','finalReport')" data-i18n="tab_std_report">تقرير القياسي</button>
+      </div>
+    </div>
+
+    <!-- Toolbar — compact with Settings dropdown -->
+    <div id="toolbar" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+      <span class="lock-indicator">🔒 مقفل</span>
+      <button class="btn btn-info" onclick="previewCurrentReport()" data-i18n="btn_preview">👁 معاينة</button>
+      <button class="btn btn-primary" onclick="printReport()" data-i18n="btn_print">🖨 طباعة</button>
+      <button class="btn btn-success" onclick="addRow()" data-i18n="btn_add_row">➕ صف</button>
+      <button class="btn btn-danger" onclick="removeRow()" data-i18n="btn_remove_row">➖ صف</button>
+
+      <!-- Settings dropdown -->
+      <div class="settings-wrapper" id="settingsWrapper">
+        <button class="btn btn-outline" onclick="toggleSettingsPanel(event)" id="btnSettings" style="gap:6px;">
+          ⚙️ <span data-i18n="btn_settings">إعدادات</span> <span style="font-size:10px;opacity:.6;">▼</span>
+        </button>
+        <div class="settings-panel" id="settingsPanel">
+          <div class="settings-panel-header">⚙️ إعدادات وأدوات</div>
+
+          <!-- Data tools -->
+          <div class="settings-section">
+            <div class="settings-section-label">أدوات البيانات</div>
+            <button class="settings-item" onclick="fillDemoData();closeSettings()">
+              <span class="si-icon">📋</span><span class="si-label" data-i18n="btn_demo">بيانات تجريبية</span>
+            </button>
+            <button class="settings-item" onclick="saveDataToFile();closeSettings()">
+              <span class="si-icon">💾</span><span class="si-label">حفظ البيانات (JSON)</span>
+            </button>
+            <label class="settings-item" style="cursor:pointer;">
+              <span class="si-icon">📂</span><span class="si-label">تحميل بيانات محفوظة</span>
+              <input type="file" accept=".json" onchange="loadDataFromFile(event);closeSettings()" style="display:none;">
+            </label>
+            <button class="settings-item si-danger" onclick="resetAll();closeSettings()">
+              <span class="si-icon">🔄</span><span class="si-label" data-i18n="btn_reset">إعادة ضبط الكل</span>
+            </button>
+          </div>
+
+          <!-- Display -->
+          <div class="settings-section">
+            <div class="settings-section-label">العرض</div>
+            <button class="settings-item" id="siDarkMode" onclick="toggleDarkMode()">
+              <span class="si-icon" id="siDarkIcon">🌙</span>
+              <span class="si-label">الوضع الليلي</span>
+              <span class="si-badge" id="siDarkBadge">إيقاف</span>
+            </button>
+          </div>
+
+          <!-- Lock -->
+          <div class="settings-section">
+            <div class="settings-section-label">الأمان</div>
+            <button class="settings-item" id="siLock" onclick="toggleDataLock()">
+              <span class="si-icon" id="siLockIcon">🔓</span>
+              <span class="si-label">قفل البيانات</span>
+              <span class="si-badge" id="siLockBadge">غير مقفل</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ████  MODIFIED PROCTOR — DATA ENTRY TAB
+============================================================ -->
+<div id="dataEntryTab" class="tab-content active max-w-screen-2xl mx-auto px-4 py-4">
+
+  <!-- A) Project & Sample Information -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_project">A) معلومات المشروع والعينة</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_project_name">اسم المشروع</label>
+          <input type="text" id="projectName" class="form-control" data-i18n-ph="ph_project_name" placeholder="اسم المشروع">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_report_no">رقم التقرير</label>
+          <input type="text" id="reportNo" class="form-control" placeholder="RPT-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_client">العميل / المقاول</label>
+          <input type="text" id="client" class="form-control" data-i18n-ph="ph_client" placeholder="اسم العميل">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_report_date">تاريخ التقرير</label>
+          <input type="date" id="reportDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_sample_id">معرّف العينة</label>
+          <input type="text" id="sampleId" class="form-control" placeholder="S-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_test_date">تاريخ الاختبار</label>
+          <input type="date" id="testDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_location">الموقع / رقم الحفر</label>
+          <input type="text" id="location" class="form-control" data-i18n-ph="ph_location" placeholder="BH-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_depth">العمق (م)</label>
+          <input type="number" id="depth" class="form-control" step="0.1" placeholder="1.50">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_as_received_wc">محتوى الرطوبة عند الاستلام (%)</label>
+          <input type="number" id="asReceivedWC" class="form-control" step="0.1" placeholder="12.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_sample_mass">كتلة العينة (كغ)</label>
+          <input type="number" id="sampleMass" class="form-control" step="0.1" placeholder="25.0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B) Test Setup -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_test_setup">B) إعداد الاختبار</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_method">الطريقة</label>
+          <select id="method" class="form-control">
+            <option value="Method A (4-in mold, No.4 sieve)">Method A (4-in mold, No.4 sieve)</option>
+            <option value="Method B (4-in mold, 3/8-in sieve)">Method B (4-in mold, 3/8-in sieve)</option>
+            <option value="Method C (6-in mold, 3/4-in sieve)">Method C (6-in mold, 3/4-in sieve)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_procedure">الإجراء</label>
+          <select id="procedure" class="form-control">
+            <option value="Moist Method">Moist Method</option>
+            <option value="Dry Method">Dry Method</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_rammer_mass">كتلة المدق (كغ)</label>
+          <input type="number" id="rammerMass" class="form-control" step="0.01" value="4.536">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_drop_height">ارتفاع السقوط (مم)</label>
+          <input type="number" id="dropHeight" class="form-control" step="1" value="457">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_num_layers">عدد الطبقات</label>
+          <input type="number" id="numLayers" class="form-control" step="1" value="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_blows_layer">ضربات لكل طبقة</label>
+          <input type="number" id="blowsLayer" class="form-control" step="1" value="25">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_mold_volume">حجم القالب (سم³)</label>
+          <input type="number" id="moldVolume" class="form-control" step="0.1" value="944.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_mold_id">معرّف القالب</label>
+          <input type="text" id="moldId" class="form-control" placeholder="M-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_sieve">المنخل المستخدم</label>
+          <input type="text" id="sieveUsed" class="form-control" value="No.4">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_fraction_used">الجزء المستخدم</label>
+          <input type="text" id="fractionUsed" class="form-control" data-i18n-ph="ph_fraction" placeholder="الجزء الناعم">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C) Sample Description -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_sample_desc">C) وصف العينة</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group md:col-span-2">
+          <label class="form-label" data-i18n="lbl_sample_desc">وصف العينة</label>
+          <input type="text" id="sampleDesc" class="form-control" data-i18n-ph="ph_sample_desc" placeholder="وصف الطبقة / المادة">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_uscs">تصنيف USCS</label>
+          <input type="text" id="uscs" class="form-control" placeholder="GM / SC / CL ...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_aashto">تصنيف AASHTO</label>
+          <input type="text" id="aashto" class="form-control" placeholder="A-2-4 / A-6 ...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_gs">الوزن النوعي Gs</label>
+          <input type="number" id="gsValue" class="form-control" step="0.001" value="2.680">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_oversize_corr">تصحيح الحجم الزائد</label>
+          <input type="text" id="oversizeCorr" class="form-control" data-i18n-ph="ph_na" placeholder="لا ينطبق">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_slaking">وقت النقع / المعالجة</label>
+          <input type="text" id="slakingTime" class="form-control" data-i18n-ph="ph_na" placeholder="لا ينطبق">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_remarks">ملاحظات</label>
+          <input type="text" id="remarks" class="form-control" data-i18n-ph="ph_remarks" placeholder="أي ملاحظات إضافية">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D) Equipment Traceability -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_equip">D) تتبع المعدات (ISO 17025)</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_balance_id">معرّف الميزان</label>
+          <input type="text" id="balanceId" class="form-control" placeholder="BAL-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_mold_id2">معرّف القالب</label>
+          <input type="text" id="moldId2" class="form-control" placeholder="MLD-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_rammer_id">معرّف المدق</label>
+          <input type="text" id="rammerId" class="form-control" placeholder="RAM-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_oven_id">معرّف الفرن</label>
+          <input type="text" id="ovenId" class="form-control" placeholder="OVN-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_calib_due">تاريخ معايرة</label>
+          <input type="date" id="calibDue" class="form-control">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E) Environmental Conditions -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_env">E) الظروف البيئية والفنيون</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_temp">درجة الحرارة (°C)</label>
+          <input type="number" id="envTemp" class="form-control" step="0.1" placeholder="23.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_humidity">الرطوبة النسبية (%)</label>
+          <input type="number" id="envHumidity" class="form-control" step="0.1" placeholder="55.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_technician">اسم الفني القائم بالاختبار</label>
+          <input type="text" id="techName" class="form-control" data-i18n-ph="ph_tech" placeholder="اسم الفني">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_reviewed_by">مراجعة بواسطة</label>
+          <input type="text" id="reviewedBy" class="form-control" data-i18n-ph="ph_reviewed" placeholder="اسم المراجع">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_approved_by">اعتماد بواسطة</label>
+          <input type="text" id="approvedBy" class="form-control" data-i18n-ph="ph_approved" placeholder="اسم المعتمد">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F) Oversize Correction -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_oversize">F) تصحيح الكثافة للحجم الزائد</div>
+    <div class="card-body">
+      <div class="checkbox-group mb-3">
+        <input type="checkbox" id="enableOversize" onchange="toggleOversize()">
+        <label for="enableOversize" class="form-label mb-0" data-i18n="lbl_enable_oversize">تفعيل تصحيح الحجم الزائد</label>
+      </div>
+      <div id="oversizeFields" class="grid grid-cols-2 md:grid-cols-4 gap-3 hidden">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_pct_oversize">نسبة الحجم الزائد المحتجز (%)</label>
+          <input type="number" id="pctOversize" class="form-control" step="0.1" placeholder="15.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_gs_oversize">الوزن النوعي للحجم الزائد</label>
+          <input type="number" id="gsOversize" class="form-control" step="0.001" value="2.750">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_corr_method">طريقة التصحيح</label>
+          <select id="corrMethod" class="form-control">
+            <option value="ASTM D4718">ASTM D4718</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+        <div class="form-group flex items-end">
+          <div class="checkbox-group">
+            <input type="checkbox" id="useCorrDensity" checked>
+            <label for="useCorrDensity" class="form-label mb-0" data-i18n="lbl_use_corr">استخدام الكثافة المصححة</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G) Compaction Weights Table -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_comp_weights">G) جدول أوزان الدمك (المحاولات الخمس)</div>
+    <div class="card-body overflow-x-auto">
+      <table class="data-table" id="weightsTable">
+        <thead>
+          <tr>
+            <th data-i18n="col_trial">المحاولة</th>
+            <th data-i18n="col_mold_no">رقم القالب</th>
+            <th data-i18n="col_mold_soil_wt">قالب+تربة (كغ)</th>
+            <th data-i18n="col_mold_wt">وزن القالب (كغ)</th>
+            <th data-i18n="col_wet_soil_wt">وزن التربة الرطبة (كغ)</th>
+            <th data-i18n="col_mold_vol">حجم القالب (سم³)</th>
+            <th data-i18n="col_wet_density">الكثافة الرطبة (غ/سم³)</th>
+          </tr>
+        </thead>
+        <tbody id="weightsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- H) Moisture Content Table -->
+  <div class="card">
+    <div class="card-header" data-i18n="sec_moisture">H) جدول محتوى الرطوبة والكثافة الجافة</div>
+    <div class="card-body overflow-x-auto">
+      <table class="data-table" id="moistureTable">
+        <thead>
+          <tr>
+            <th data-i18n="col_trial">المحاولة</th>
+            <th data-i18n="col_container_no">رقم العلبة</th>
+            <th data-i18n="col_wet_dry_tare">رطب+جاف+وعاء (غ)</th>
+            <th data-i18n="col_dry_tare">جاف+وعاء (غ)</th>
+            <th data-i18n="col_tare_wt">وزن الوعاء (غ)</th>
+            <th data-i18n="col_water_mass">كتلة الماء (غ)</th>
+            <th data-i18n="col_dry_soil_mass">كتلة التربة الجافة (غ)</th>
+            <th data-i18n="col_water_content">محتوى الرطوبة (%)</th>
+            <th data-i18n="col_dry_density">الكثافة الجافة (غ/سم³)</th>
+            <th data-i18n="col_corr_density">الكثافة المصححة (غ/سم³)</th>
+          </tr>
+        </thead>
+        <tbody id="moistureTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end dataEntryTab (Modified) -->
+
+<!-- ============================================================
+     ████  MODIFIED PROCTOR — FINAL REPORT TAB
+============================================================ -->
+<div id="finalReportTab" class="tab-content py-6 px-4">
+<div id="reportContainer" dir="ltr">
+
+  <!-- REPORT HEADER -->
+  <div class="rpt-header">
+    <div class="rpt-dev-strip">
+      تم إعداد وتطوير: م / محمد أحمد القصبي
+      <span>|</span>
+      Prepared &amp; Developed by: Eng. Mohamed Ahmed Elksasby
+    </div>
+    <div class="rpt-header-top">
+      <div class="rpt-logo-box">
+        <svg viewBox="0 0 70 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="66" height="54" rx="5" fill="#f0f4f8" stroke="#1e3a5f" stroke-width="2"/>
+          <text x="35" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#1e3a5f" font-family="Arial">SOIL</text>
+          <text x="35" y="38" text-anchor="middle" font-size="9" font-weight="700" fill="#1e3a5f" font-family="Arial">LAB</text>
+          <path d="M10 48 Q35 26 60 48" stroke="#1e3a5f" stroke-width="2" fill="none"/>
+          <circle cx="18" cy="43" r="3" fill="#1e3a5f"/>
+          <circle cx="35" cy="30" r="3" fill="#1e3a5f"/>
+          <circle cx="52" cy="43" r="3" fill="#1e3a5f"/>
+        </svg>
+      </div>
+      <div class="rpt-title-box">
+        <h1>MOISTURE-DENSITY RELATIONSHIP REPORT</h1>
+        <h2>Modified Proctor Compaction Test — ASTM D1557-12(2021)</h2>
+      </div>
+      <div class="rpt-std-box">
+        <div style="font-size:7pt;color:#888;">Standard</div>
+        <div style="font-size:10pt;font-weight:900;color:#1e3a5f;">ASTM D1557</div>
+        <div style="font-size:7pt;color:#888;">-12(2021)</div>
+        <hr style="margin:4px 0;border-color:#ccc;">
+        <div style="font-size:7pt;color:#888;">ISO 17025</div>
+        <div style="font-size:8pt;font-weight:700;color:#059669;">Accredited</div>
+      </div>
+    </div>
+    <div class="rpt-header-info">
+      <div class="rpt-info-cell"><span class="rpt-info-label">Report No.: </span><span class="rpt-info-val" id="rpt_reportNo">—</span></div>
+      <div class="rpt-info-cell"><span class="rpt-info-label">Project: </span><span class="rpt-info-val" id="rpt_project">—</span></div>
+      <div class="rpt-info-cell"><span class="rpt-info-label">Report Date: </span><span class="rpt-info-val" id="rpt_reportDate">—</span></div>
+      <div class="rpt-info-cell" style="border-right:none;"><span class="rpt-info-label">Page: </span><span class="rpt-info-val">1 of 1</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="rpt-section-title">SECTION 1 — PROJECT &amp; SAMPLE INFORMATION</div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Project Name</span><span class="rpt-field-val" id="rpt_projectName">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Report No.</span><span class="rpt-field-val" id="rpt_reportNo2">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Client / Contractor</span><span class="rpt-field-val" id="rpt_client">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Report Date</span><span class="rpt-field-val" id="rpt_reportDate2">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Sample ID</span><span class="rpt-field-val" id="rpt_sampleId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Test Date</span><span class="rpt-field-val" id="rpt_testDate">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Location / Boring No.</span><span class="rpt-field-val" id="rpt_location">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Depth (m)</span><span class="rpt-field-val" id="rpt_depth">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">As-Received Water Content</span><span class="rpt-field-val" id="rpt_asRecWC">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Sample Mass (kg)</span><span class="rpt-field-val" id="rpt_sampleMass">—</span></div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="rpt-section-title">SECTION 2 — TEST SETUP</div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Method</span><span class="rpt-field-val" id="rpt_method">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Procedure</span><span class="rpt-field-val" id="rpt_procedure">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Rammer Mass (kg)</span><span class="rpt-field-val" id="rpt_rammerMass">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Drop Height (mm)</span><span class="rpt-field-val" id="rpt_dropHeight">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Number of Layers</span><span class="rpt-field-val" id="rpt_numLayers">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Blows per Layer</span><span class="rpt-field-val" id="rpt_blowsLayer">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Mold Volume (cm³)</span><span class="rpt-field-val" id="rpt_moldVolume">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Mold ID</span><span class="rpt-field-val" id="rpt_moldId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Sieve for Method</span><span class="rpt-field-val" id="rpt_sieve">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Fraction Used</span><span class="rpt-field-val" id="rpt_fraction">—</span></div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="rpt-section-title">SECTION 3 — SAMPLE DESCRIPTION</div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Sample Description</span><span class="rpt-field-val" id="rpt_sampleDesc">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Specific Gravity (Gs)</span><span class="rpt-field-val" id="rpt_gs">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">USCS Classification</span><span class="rpt-field-val" id="rpt_uscs">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">AASHTO Classification</span><span class="rpt-field-val" id="rpt_aashto">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Oversize Correction</span><span class="rpt-field-val" id="rpt_oversizeCorr">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Slaking / Curing Time</span><span class="rpt-field-val" id="rpt_slaking">—</span></div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="rpt-section-title">SECTION 4 — EQUIPMENT TRACEABILITY (ISO 17025)</div>
+  <div class="rpt-env">
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Temperature</div><div class="rpt-env-val" id="rpt_temp">— °C</div></div>
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Rel. Humidity</div><div class="rpt-env-val" id="rpt_humidity">— %</div></div>
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Technician</div><div class="rpt-env-val" id="rpt_tech">—</div></div>
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Calibration Due</div><div class="rpt-env-val" id="rpt_calibDue2">—</div></div>
+  </div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Balance ID</span><span class="rpt-field-val" id="rpt_balanceId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Mold ID</span><span class="rpt-field-val" id="rpt_moldId2">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Rammer ID</span><span class="rpt-field-val" id="rpt_rammerId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Oven ID</span><span class="rpt-field-val" id="rpt_ovenId">—</span></div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="rpt-section-title">SECTION 5 — COMPACTION DATA TABLE</div>
+  <div style="font-size:7.5pt;font-weight:700;background:#e8edf3;padding:2px 6px;border:1px solid #aaa;border-bottom:none;text-transform:uppercase;">Compaction Weights</div>
+  <table class="rpt-table" id="rpt_weightsTable">
+    <thead>
+      <tr>
+        <th>Trial No.</th><th>Mold No.</th><th>Mold + Soil Wt (kg)</th>
+        <th>Mold Wt (kg)</th><th>Wet Soil Wt (kg)</th><th>Mold Volume (cm³)</th><th>Wet Density (g/cm³)</th>
+      </tr>
+    </thead>
+    <tbody id="rpt_weightsBody"></tbody>
+  </table>
+  <div style="font-size:7.5pt;font-weight:700;background:#e8edf3;padding:2px 6px;border:1px solid #aaa;border-bottom:none;margin-top:4px;text-transform:uppercase;">Moisture Content &amp; Dry Density</div>
+  <table class="rpt-moist-table" id="rpt_moistureTable">
+    <thead>
+      <tr>
+        <th>Trial</th><th>Container No.</th><th>Wet+Dry+Tare (g)</th><th>Dry+Tare (g)</th>
+        <th>Tare Wt (g)</th><th>Water Mass (g)</th><th>Dry Soil (g)</th><th>w (%)</th><th>ρd (g/cm³)</th><th>Corr. ρd</th>
+      </tr>
+    </thead>
+    <tbody id="rpt_moistureBody"></tbody>
+  </table>
+
+  <!-- SECTION 6 -->
+  <div id="rpt_dataWarning" style="display:none;background:#fef3c7;border:1px solid #d97706;padding:4px 8px;font-size:8pt;color:#92400e;margin-bottom:4px;border-radius:3px;"></div>
+  <div class="rpt-section-title">SECTION 6 — MOISTURE-DENSITY CURVE</div>
+  <div class="rpt-chart-container">
+    <canvas id="compactionChart"></canvas>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="rpt-section-title">SECTION 7 — TEST RESULTS SUMMARY</div>
+  <div class="rpt-summary">
+    <div class="rpt-summary-header">COMPACTION TEST RESULTS — ASTM D1557-12(2021) | MODIFIED PROCTOR</div>
+    <div class="rpt-summary-body">
+      <div class="rpt-summary-item">
+        <div class="rpt-summary-label">Maximum Dry Density (MDD)</div>
+        <div class="rpt-summary-value" id="rpt_mdd">—</div>
+        <div class="rpt-summary-unit">g/cm³</div>
+      </div>
+      <div class="rpt-summary-item">
+        <div class="rpt-summary-label">Optimum Water Content (OMC)</div>
+        <div class="rpt-summary-value" id="rpt_omc">—</div>
+        <div class="rpt-summary-unit">%</div>
+      </div>
+      <div class="rpt-summary-item">
+        <div class="rpt-summary-label">Reference Standard</div>
+        <div class="rpt-summary-value" style="font-size:9pt;">ASTM D1557</div>
+        <div class="rpt-summary-unit">-12(2021)</div>
+      </div>
+      <div class="rpt-summary-item">
+        <div class="rpt-summary-label">USCS Classification</div>
+        <div class="rpt-summary-value" style="font-size:11pt;" id="rpt_uscs2">—</div>
+        <div class="rpt-summary-unit">&nbsp;</div>
+      </div>
+      <div class="rpt-summary-item">
+        <div class="rpt-summary-label">AASHTO Classification</div>
+        <div class="rpt-summary-value" style="font-size:11pt;" id="rpt_aashto2">—</div>
+        <div class="rpt-summary-unit">&nbsp;</div>
+      </div>
+      <div class="rpt-summary-item">
+        <div class="rpt-summary-label">Specific Gravity (Gs)</div>
+        <div class="rpt-summary-value" style="font-size:11pt;" id="rpt_gs2">—</div>
+        <div class="rpt-summary-unit">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+  <span id="rpt_densityNote" style="font-size:7.5pt;color:#555;margin-right:8px;display:block;margin-top:2px;"></span>
+  <div id="rpt_fitNote" style="font-size:7pt;color:#dc2626;margin-top:3px;"></div>
+
+  <!-- REMARKS -->
+  <div style="font-size:7.5pt;font-weight:700;background:#e8edf3;padding:2px 6px;border:1px solid #aaa;border-bottom:none;text-transform:uppercase;">REMARKS</div>
+  <div class="rpt-remarks" id="rpt_remarks">—</div>
+
+  <!-- SIGNATURES -->
+  <div class="rpt-section-title">SIGNATURES &amp; AUTHORIZATION</div>
+  <div class="rpt-signature">
+    <!-- Left col: Prepared By -->
+    <div class="rpt-sig-col">
+      <div class="rpt-sig-col-header">Prepared / Tested By</div>
+      <div style="text-align:center;">
+        <div class="rpt-sig-line"></div>
+        <div class="rpt-sig-label">Laboratory Technician</div>
+        <div class="rpt-sig-name" id="rpt_testedBy">_____________________</div>
+        <div class="rpt-sig-date">Date: _______________</div>
+      </div>
+    </div>
+    <!-- Right col: QM + Technical Director -->
+    <div class="rpt-sig-col">
+      <div class="rpt-sig-col-header">Reviewed &amp; Approved By</div>
+      <div class="rpt-sig-row">
+        <div class="rpt-sig-item">
+          <div class="rpt-sig-line"></div>
+          <div class="rpt-sig-label">Quality Manager</div>
+          <div class="rpt-sig-name" id="rpt_reviewedBy">_____________________</div>
+          <div class="rpt-sig-date">Date: _______________</div>
+        </div>
+        <div class="rpt-sig-item">
+          <div class="rpt-sig-line"></div>
+          <div class="rpt-sig-label">Technical Director</div>
+          <div class="rpt-sig-name" id="rpt_approvedBy">_____________________</div>
+          <div class="rpt-sig-date">Date: _______________</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="rpt-footer">
+    <span>ASTM D1557-12(2021) | Modified Proctor Compaction Test</span>
+    <span id="rpt_footerDate"></span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</div><!-- end reportContainer -->
+</div><!-- end finalReportTab -->
+
+<!-- ============================================================
+     ████  STANDARD PROCTOR — DATA ENTRY TAB  (ASTM D698)
+============================================================ -->
+<div id="dataEntryTabStd" class="tab-content max-w-screen-2xl mx-auto px-4 py-4">
+
+  <!-- STD banner -->
+  <div class="mb-4 p-3 rounded-lg border-2 border-purple-400 bg-purple-50">
+    <div class="flex items-center gap-3">
+      <span class="std-badge text-sm px-3 py-1">STANDARD PROCTOR</span>
+      <div>
+        <div class="font-bold text-purple-800" data-i18n="std_banner_title">بروكتور القياسي — ASTM D698</div>
+        <div class="text-xs text-purple-600" data-i18n="std_banner_sub">Standard Proctor Compaction Test — ASTM D698-12(2021) | طاقة دمك 600 kN·m/m³</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA) Project & Sample Information -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="std_sec_project">A) معلومات المشروع والعينة</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_project_name">اسم المشروع</label>
+          <input type="text" id="s_projectName" class="form-control" data-i18n-ph="ph_project_name" placeholder="اسم المشروع">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_report_no">رقم التقرير</label>
+          <input type="text" id="s_reportNo" class="form-control" placeholder="RPT-STD-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_client">العميل / المقاول</label>
+          <input type="text" id="s_client" class="form-control" data-i18n-ph="ph_client" placeholder="اسم العميل">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_report_date">تاريخ التقرير</label>
+          <input type="date" id="s_reportDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_sample_id">معرّف العينة</label>
+          <input type="text" id="s_sampleId" class="form-control" placeholder="S-STD-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_test_date">تاريخ الاختبار</label>
+          <input type="date" id="s_testDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_location">الموقع / رقم الحفر</label>
+          <input type="text" id="s_location" class="form-control" placeholder="BH-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_depth">العمق (م)</label>
+          <input type="number" id="s_depth" class="form-control" step="0.1" placeholder="1.50">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_as_received_wc">محتوى الرطوبة عند الاستلام (%)</label>
+          <input type="number" id="s_asReceivedWC" class="form-control" step="0.1" placeholder="12.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_sample_mass">كتلة العينة (كغ)</label>
+          <input type="number" id="s_sampleMass" class="form-control" step="0.1" placeholder="25.0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SB) Test Setup — ASTM D698 specific values -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="std_sec_test_setup">B) إعداد الاختبار — القياسي</div>
+    <div class="card-body">
+      <!-- Info bar showing D698 vs D1557 differences -->
+      <div class="mb-3 p-2 bg-amber-50 border border-amber-300 rounded text-xs text-amber-800">
+        <strong data-i18n="std_info_title">الفرق بين بروكتور القياسي والمعدل:</strong>
+        <span data-i18n="std_info_text"> كتلة المدق 2.495 كغ، ارتفاع السقوط 305 مم، 3 طبقات — مقابل 4.536 كغ، 457 مم، 5 طبقات في المعدل.</span>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="std_lbl_method">الطريقة (D698)</label>
+          <select id="s_method" class="form-control" style="border-color:#7c3aed;">
+            <option value="Method A (4-in mold, No.4 sieve) — D698">Method A (4-in mold, No.4 sieve)</option>
+            <option value="Method B (4-in mold, 3/8-in sieve) — D698">Method B (4-in mold, 3/8-in sieve)</option>
+            <option value="Method C (6-in mold, 3/4-in sieve) — D698">Method C (6-in mold, 3/4-in sieve)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_procedure">الإجراء</label>
+          <select id="s_procedure" class="form-control">
+            <option value="Moist Method">Moist Method</option>
+            <option value="Dry Method">Dry Method</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="std_lbl_rammer">كتلة المدق (كغ) — 2.495</label>
+          <input type="number" id="s_rammerMass" class="form-control" step="0.001" value="2.495" style="border-color:#7c3aed;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="std_lbl_drop">ارتفاع السقوط (مم) — 305</label>
+          <input type="number" id="s_dropHeight" class="form-control" step="1" value="305" style="border-color:#7c3aed;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="std_lbl_layers">عدد الطبقات — 3</label>
+          <input type="number" id="s_numLayers" class="form-control" step="1" value="3" style="border-color:#7c3aed;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_blows_layer">ضربات لكل طبقة</label>
+          <input type="number" id="s_blowsLayer" class="form-control" step="1" value="25">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_mold_volume">حجم القالب (سم³)</label>
+          <input type="number" id="s_moldVolume" class="form-control" step="0.1" value="944.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_mold_id">معرّف القالب</label>
+          <input type="text" id="s_moldId" class="form-control" placeholder="M-STD-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_sieve">المنخل المستخدم</label>
+          <input type="text" id="s_sieveUsed" class="form-control" value="No.4">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_fraction_used">الجزء المستخدم</label>
+          <input type="text" id="s_fractionUsed" class="form-control" placeholder="Passing No.4">
+        </div>
+      </div>
+      <!-- Compaction Energy display -->
+      <div class="mt-3 p-2 bg-purple-50 border border-purple-200 rounded text-xs">
+        <strong class="text-purple-700" data-i18n="std_energy_label">طاقة الدمك المحسوبة:</strong>
+        <span id="s_compactionEnergy" class="text-purple-900 font-bold"> — kN·m/m³</span>
+        <span class="text-gray-500 mr-2" data-i18n="std_energy_note">(المعيار القياسي ASTM D698 ≈ 600 kN·m/m³)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SC) Sample Description -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="std_sec_sample">C) وصف العينة</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group md:col-span-2">
+          <label class="form-label" data-i18n="lbl_sample_desc">وصف العينة</label>
+          <input type="text" id="s_sampleDesc" class="form-control" placeholder="وصف الطبقة / المادة">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_uscs">تصنيف USCS</label>
+          <input type="text" id="s_uscs" class="form-control" placeholder="GM / SC / CL ...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_aashto">تصنيف AASHTO</label>
+          <input type="text" id="s_aashto" class="form-control" placeholder="A-2-4 / A-6 ...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_gs">الوزن النوعي Gs</label>
+          <input type="number" id="s_gsValue" class="form-control" step="0.001" value="2.680">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_slaking">وقت النقع / المعالجة</label>
+          <input type="text" id="s_slakingTime" class="form-control" placeholder="N/A">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_remarks">ملاحظات</label>
+          <input type="text" id="s_remarks" class="form-control" placeholder="أي ملاحظات إضافية">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SD) Equipment Traceability -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="sec_equip">D) تتبع المعدات (ISO 17025)</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_balance_id">معرّف الميزان</label>
+          <input type="text" id="s_balanceId" class="form-control" placeholder="BAL-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_mold_id2">معرّف القالب</label>
+          <input type="text" id="s_moldId2" class="form-control" placeholder="MLD-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_rammer_id">معرّف المدق</label>
+          <input type="text" id="s_rammerId" class="form-control" placeholder="RAM-STD-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_oven_id">معرّف الفرن</label>
+          <input type="text" id="s_ovenId" class="form-control" placeholder="OVN-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_calib_due">تاريخ معايرة</label>
+          <input type="date" id="s_calibDue" class="form-control">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SE) Environmental Conditions -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="sec_env">E) الظروف البيئية والفنيون</div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_temp">درجة الحرارة (°C)</label>
+          <input type="number" id="s_envTemp" class="form-control" step="0.1" placeholder="23.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_humidity">الرطوبة النسبية (%)</label>
+          <input type="number" id="s_envHumidity" class="form-control" step="0.1" placeholder="55.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_technician">اسم الفني القائم بالاختبار</label>
+          <input type="text" id="s_techName" class="form-control" placeholder="اسم الفني">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_reviewed_by">مراجعة بواسطة</label>
+          <input type="text" id="s_reviewedBy" class="form-control" placeholder="اسم المراجع">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_approved_by">اعتماد بواسطة</label>
+          <input type="text" id="s_approvedBy" class="form-control" placeholder="اسم المعتمد">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SF) Oversize Correction -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="sec_oversize">F) تصحيح الكثافة للحجم الزائد</div>
+    <div class="card-body">
+      <div class="checkbox-group mb-3">
+        <input type="checkbox" id="s_enableOversize" onchange="toggleOversizeStd()">
+        <label for="s_enableOversize" class="form-label mb-0" data-i18n="lbl_enable_oversize">تفعيل تصحيح الحجم الزائد</label>
+      </div>
+      <div id="s_oversizeFields" class="grid grid-cols-2 md:grid-cols-4 gap-3 hidden">
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_pct_oversize">نسبة الحجم الزائد المحتجز (%)</label>
+          <input type="number" id="s_pctOversize" class="form-control" step="0.1" placeholder="15.0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_gs_oversize">الوزن النوعي للحجم الزائد</label>
+          <input type="number" id="s_gsOversize" class="form-control" step="0.001" value="2.750">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="lbl_corr_method">طريقة التصحيح</label>
+          <select id="s_corrMethod" class="form-control">
+            <option value="ASTM D4718">ASTM D4718</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+        <div class="form-group flex items-end">
+          <div class="checkbox-group">
+            <input type="checkbox" id="s_useCorrDensity" checked>
+            <label for="s_useCorrDensity" class="form-label mb-0" data-i18n="lbl_use_corr">استخدام الكثافة المصححة</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SG) Compaction Weights Table -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="std_sec_weights">G) جدول أوزان الدمك — القياسي</div>
+    <div class="card-body overflow-x-auto">
+      <table class="data-table data-table-std" id="s_weightsTable">
+        <thead>
+          <tr>
+            <th data-i18n="col_trial">المحاولة</th>
+            <th data-i18n="col_mold_no">رقم القالب</th>
+            <th data-i18n="col_mold_soil_wt">قالب+تربة (كغ)</th>
+            <th data-i18n="col_mold_wt">وزن القالب (كغ)</th>
+            <th data-i18n="col_wet_soil_wt">وزن التربة الرطبة (كغ)</th>
+            <th data-i18n="col_mold_vol">حجم القالب (سم³)</th>
+            <th data-i18n="col_wet_density">الكثافة الرطبة (غ/سم³)</th>
+          </tr>
+        </thead>
+        <tbody id="s_weightsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SH) Moisture Content Table -->
+  <div class="card">
+    <div class="card-header-std" data-i18n="std_sec_moisture">H) جدول محتوى الرطوبة والكثافة الجافة — القياسي</div>
+    <div class="card-body overflow-x-auto">
+      <table class="data-table data-table-std" id="s_moistureTable">
+        <thead>
+          <tr>
+            <th data-i18n="col_trial">المحاولة</th>
+            <th data-i18n="col_container_no">رقم العلبة</th>
+            <th data-i18n="col_wet_dry_tare">رطب+جاف+وعاء (غ)</th>
+            <th data-i18n="col_dry_tare">جاف+وعاء (غ)</th>
+            <th data-i18n="col_tare_wt">وزن الوعاء (غ)</th>
+            <th data-i18n="col_water_mass">كتلة الماء (غ)</th>
+            <th data-i18n="col_dry_soil_mass">كتلة التربة الجافة (غ)</th>
+            <th data-i18n="col_water_content">محتوى الرطوبة (%)</th>
+            <th data-i18n="col_dry_density">الكثافة الجافة (غ/سم³)</th>
+            <th data-i18n="col_corr_density">الكثافة المصححة (غ/سم³)</th>
+          </tr>
+        </thead>
+        <tbody id="s_moistureTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end dataEntryTabStd -->
+
+<!-- ============================================================
+     ████  STANDARD PROCTOR — FINAL REPORT TAB
+============================================================ -->
+<div id="finalReportTabStd" class="tab-content py-6 px-4">
+<div id="reportContainerStd" dir="ltr">
+
+  <!-- REPORT HEADER — Standard (purple) -->
+  <div class="rpt-header" style="border-color:#7c3aed;">
+    <div class="rpt-dev-strip" style="background:linear-gradient(90deg,#5b21b6,#7c3aed,#1e3a5f);">
+      تم إعداد وتطوير: م / محمد أحمد القصبي
+      <span>|</span>
+      Prepared &amp; Developed by: Eng. Mohamed Ahmed Elksasby
+    </div>
+    <div class="rpt-header-top">
+      <div class="rpt-logo-box" style="border-right-color:#7c3aed;">
+        <svg viewBox="0 0 70 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="66" height="54" rx="5" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+          <text x="35" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#7c3aed" font-family="Arial">SOIL</text>
+          <text x="35" y="38" text-anchor="middle" font-size="9" font-weight="700" fill="#7c3aed" font-family="Arial">LAB</text>
+          <path d="M10 48 Q35 26 60 48" stroke="#7c3aed" stroke-width="2" fill="none"/>
+          <circle cx="18" cy="43" r="3" fill="#7c3aed"/>
+          <circle cx="35" cy="30" r="3" fill="#7c3aed"/>
+          <circle cx="52" cy="43" r="3" fill="#7c3aed"/>
+        </svg>
+      </div>
+      <div class="rpt-title-box">
+        <h1 style="color:#7c3aed;">MOISTURE-DENSITY RELATIONSHIP REPORT</h1>
+        <h2>Standard Proctor Compaction Test — ASTM D698-12(2021)</h2>
+      </div>
+      <div class="rpt-std-box" style="border-left-color:#7c3aed;">
+        <div style="font-size:7pt;color:#888;">Standard</div>
+        <div style="font-size:10pt;font-weight:900;color:#7c3aed;">ASTM D698</div>
+        <div style="font-size:7pt;color:#888;">-12(2021)</div>
+        <hr style="margin:4px 0;border-color:#ccc;">
+        <div style="font-size:7pt;color:#888;">ISO 17025</div>
+        <div style="font-size:8pt;font-weight:700;color:#059669;">Accredited</div>
+      </div>
+    </div>
+    <div class="rpt-header-info" style="border-top:1px solid #7c3aed;">
+      <div class="rpt-info-cell"><span class="rpt-info-label">Report No.: </span><span class="rpt-info-val" id="s_rpt_reportNo">—</span></div>
+      <div class="rpt-info-cell"><span class="rpt-info-label">Project: </span><span class="rpt-info-val" id="s_rpt_project">—</span></div>
+      <div class="rpt-info-cell"><span class="rpt-info-label">Report Date: </span><span class="rpt-info-val" id="s_rpt_reportDate">—</span></div>
+      <div class="rpt-info-cell" style="border-right:none;"><span class="rpt-info-label">Page: </span><span class="rpt-info-val">1 of 1</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="rpt-section-title-std">SECTION 1 — PROJECT &amp; SAMPLE INFORMATION</div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Project Name</span><span class="rpt-field-val" id="s_rpt_projectName">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Report No.</span><span class="rpt-field-val" id="s_rpt_reportNo2">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Client / Contractor</span><span class="rpt-field-val" id="s_rpt_client">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Report Date</span><span class="rpt-field-val" id="s_rpt_reportDate2">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Sample ID</span><span class="rpt-field-val" id="s_rpt_sampleId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Test Date</span><span class="rpt-field-val" id="s_rpt_testDate">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Location / Boring No.</span><span class="rpt-field-val" id="s_rpt_location">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Depth (m)</span><span class="rpt-field-val" id="s_rpt_depth">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">As-Received Water Content</span><span class="rpt-field-val" id="s_rpt_asRecWC">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Sample Mass (kg)</span><span class="rpt-field-val" id="s_rpt_sampleMass">—</span></div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="rpt-section-title-std">SECTION 2 — TEST SETUP (ASTM D698 — Standard Proctor)</div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Method</span><span class="rpt-field-val" id="s_rpt_method">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Procedure</span><span class="rpt-field-val" id="s_rpt_procedure">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Rammer Mass (kg)</span><span class="rpt-field-val" id="s_rpt_rammerMass">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Drop Height (mm)</span><span class="rpt-field-val" id="s_rpt_dropHeight">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Number of Layers</span><span class="rpt-field-val" id="s_rpt_numLayers">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Blows per Layer</span><span class="rpt-field-val" id="s_rpt_blowsLayer">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Mold Volume (cm³)</span><span class="rpt-field-val" id="s_rpt_moldVolume">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Mold ID</span><span class="rpt-field-val" id="s_rpt_moldId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Sieve for Method</span><span class="rpt-field-val" id="s_rpt_sieve">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Compaction Energy</span><span class="rpt-field-val" id="s_rpt_energy">— kN·m/m³</span></div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="rpt-section-title-std">SECTION 3 — SAMPLE DESCRIPTION</div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Sample Description</span><span class="rpt-field-val" id="s_rpt_sampleDesc">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Specific Gravity (Gs)</span><span class="rpt-field-val" id="s_rpt_gs">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">USCS Classification</span><span class="rpt-field-val" id="s_rpt_uscs">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">AASHTO Classification</span><span class="rpt-field-val" id="s_rpt_aashto">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Oversize Correction</span><span class="rpt-field-val" id="s_rpt_oversizeCorr">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Slaking / Curing Time</span><span class="rpt-field-val" id="s_rpt_slaking">—</span></div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="rpt-section-title-std">SECTION 4 — EQUIPMENT TRACEABILITY (ISO 17025)</div>
+  <div class="rpt-env">
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Temperature</div><div class="rpt-env-val" id="s_rpt_temp">— °C</div></div>
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Rel. Humidity</div><div class="rpt-env-val" id="s_rpt_humidity">— %</div></div>
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Technician</div><div class="rpt-env-val" id="s_rpt_tech">—</div></div>
+    <div class="rpt-env-cell"><div class="rpt-env-lbl">Calibration Due</div><div class="rpt-env-val" id="s_rpt_calibDue">—</div></div>
+  </div>
+  <div class="rpt-info-grid">
+    <div class="rpt-field"><span class="rpt-field-lbl">Balance ID</span><span class="rpt-field-val" id="s_rpt_balanceId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Mold ID</span><span class="rpt-field-val" id="s_rpt_moldId2">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Rammer ID</span><span class="rpt-field-val" id="s_rpt_rammerId">—</span></div>
+    <div class="rpt-field"><span class="rpt-field-lbl">Oven ID</span><span class="rpt-field-val" id="s_rpt_ovenId">—</span></div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="rpt-section-title-std">SECTION 5 — COMPACTION DATA TABLE</div>
+  <div style="font-size:7.5pt;font-weight:700;background:#ede9fe;padding:2px 6px;border:1px solid #7c3aed;border-bottom:none;text-transform:uppercase;color:#5b21b6;">Compaction Weights</div>
+  <table class="rpt-table-std" id="s_rpt_weightsTable">
+    <thead>
+      <tr>
+        <th>Trial No.</th><th>Mold No.</th><th>Mold + Soil Wt (kg)</th>
+        <th>Mold Wt (kg)</th><th>Wet Soil Wt (kg)</th><th>Mold Volume (cm³)</th><th>Wet Density (g/cm³)</th>
+      </tr>
+    </thead>
+    <tbody id="s_rpt_weightsBody"></tbody>
+  </table>
+  <div style="font-size:7.5pt;font-weight:700;background:#ede9fe;padding:2px 6px;border:1px solid #7c3aed;border-bottom:none;margin-top:4px;text-transform:uppercase;color:#5b21b6;">Moisture Content &amp; Dry Density</div>
+  <table class="rpt-moist-table-std" id="s_rpt_moistureTable">
+    <thead>
+      <tr>
+        <th>Trial</th><th>Container No.</th><th>Wet+Dry+Tare (g)</th><th>Dry+Tare (g)</th>
+        <th>Tare Wt (g)</th><th>Water Mass (g)</th><th>Dry Soil (g)</th><th>w (%)</th><th>ρd (g/cm³)</th><th>Corr. ρd</th>
+      </tr>
+    </thead>
+    <tbody id="s_rpt_moistureBody"></tbody>
+  </table>
+
+  <!-- SECTION 6 -->
+  <div id="s_rpt_dataWarning" style="display:none;background:#fef3c7;border:1px solid #7c3aed;padding:4px 8px;font-size:8pt;color:#5b21b6;margin-bottom:4px;border-radius:3px;"></div>
+  <div class="rpt-section-title-std">SECTION 6 — MOISTURE-DENSITY CURVE (Standard Proctor)</div>
+  <div class="rpt-chart-container" style="border-color:#7c3aed;">
+    <canvas id="s_compactionChart"></canvas>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="rpt-section-title-std">SECTION 7 — TEST RESULTS SUMMARY</div>
+  <div class="rpt-summary-std">
+    <div class="rpt-summary-header-std">COMPACTION TEST RESULTS — ASTM D698-12(2021) | STANDARD PROCTOR</div>
+    <div class="rpt-summary-body-std">
+      <div class="rpt-summary-item-std">
+        <div class="rpt-summary-label-std">Maximum Dry Density (MDD)</div>
+        <div class="rpt-summary-value-std" id="s_rpt_mdd">—</div>
+        <div class="rpt-summary-unit-std">g/cm³</div>
+      </div>
+      <div class="rpt-summary-item-std">
+        <div class="rpt-summary-label-std">Optimum Water Content (OMC)</div>
+        <div class="rpt-summary-value-std" id="s_rpt_omc">—</div>
+        <div class="rpt-summary-unit-std">%</div>
+      </div>
+      <div class="rpt-summary-item-std">
+        <div class="rpt-summary-label-std">Reference Standard</div>
+        <div class="rpt-summary-value-std" style="font-size:9pt;">ASTM D698</div>
+        <div class="rpt-summary-unit-std">-12(2021)</div>
+      </div>
+      <div class="rpt-summary-item-std">
+        <div class="rpt-summary-label-std">USCS Classification</div>
+        <div class="rpt-summary-value-std" style="font-size:11pt;" id="s_rpt_uscs2">—</div>
+        <div class="rpt-summary-unit-std">&nbsp;</div>
+      </div>
+      <div class="rpt-summary-item-std">
+        <div class="rpt-summary-label-std">AASHTO Classification</div>
+        <div class="rpt-summary-value-std" style="font-size:11pt;" id="s_rpt_aashto2">—</div>
+        <div class="rpt-summary-unit-std">&nbsp;</div>
+      </div>
+      <div class="rpt-summary-item-std">
+        <div class="rpt-summary-label-std">Compaction Energy</div>
+        <div class="rpt-summary-value-std" style="font-size:10pt;" id="s_rpt_energy2">— kN·m/m³</div>
+        <div class="rpt-summary-unit-std">Standard = ~600 kN·m/m³</div>
+      </div>
+    </div>
+  </div>
+  <span id="s_rpt_densityNote" style="font-size:7.5pt;color:#555;margin-right:8px;display:block;margin-top:2px;"></span>
+  <div id="s_rpt_fitNote" style="font-size:7pt;color:#dc2626;margin-top:3px;"></div>
+
+  <!-- COMPARISON BOX (shows if both tests have data) -->
+  <div id="s_comparisonBox" style="display:none; border:1.5px solid #374151; margin-bottom:4px;">
+    <div style="background:#374151;color:#fff;font-weight:700;padding:3px 8px;font-size:8.5pt;text-transform:uppercase;">
+      COMPARISON: STANDARD vs. MODIFIED PROCTOR RESULTS
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+      <thead>
+        <tr>
+          <th style="background:#4b5563;color:#fff;padding:3px 6px;border:1px solid #6b7280;text-align:left;">Parameter</th>
+          <th style="background:#1e3a5f;color:#fff;padding:3px 6px;border:1px solid #6b7280;text-align:center;">Standard Proctor (D698)</th>
+          <th style="background:#7c3aed;color:#fff;padding:3px 6px;border:1px solid #6b7280;text-align:center;">Modified Proctor (D1557)</th>
+          <th style="background:#4b5563;color:#fff;padding:3px 6px;border:1px solid #6b7280;text-align:center;">Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;font-weight:700;">Maximum Dry Density — MDD (g/cm³)</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;" id="cmp_std_mdd">—</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;" id="cmp_mod_mdd">—</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;" id="cmp_diff_mdd">—</td>
+        </tr>
+        <tr style="background:#f9fafb;">
+          <td style="border:1px solid #d1d5db;padding:2px 6px;font-weight:700;">Optimum Water Content — OMC (%)</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;" id="cmp_std_omc">—</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;" id="cmp_mod_omc">—</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;" id="cmp_diff_omc">—</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;font-weight:700;">Compaction Energy (kN·m/m³)</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;">~600</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;">~2,700</td>
+          <td style="border:1px solid #d1d5db;padding:2px 6px;text-align:center;">+2,100</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:7pt;color:#555;padding:3px 8px;border-top:1px solid #d1d5db;">
+      Note: Modified Proctor typically yields higher MDD and lower OMC than Standard Proctor for the same soil.
+    </div>
+  </div>
+
+  <!-- REMARKS -->
+  <div style="font-size:7.5pt;font-weight:700;background:#ede9fe;padding:2px 6px;border:1px solid #7c3aed;border-bottom:none;text-transform:uppercase;color:#5b21b6;">REMARKS</div>
+  <div class="rpt-remarks" id="s_rpt_remarks">—</div>
+
+  <!-- SIGNATURES -->
+  <div class="rpt-section-title-std">SIGNATURES &amp; AUTHORIZATION</div>
+  <div class="rpt-signature" style="border-color:#7c3aed;">
+    <!-- Left col: Prepared By -->
+    <div class="rpt-sig-col" style="border-right-color:#7c3aed;">
+      <div class="rpt-sig-col-header rpt-sig-col-header-std">Prepared / Tested By</div>
+      <div style="text-align:center;">
+        <div class="rpt-sig-line"></div>
+        <div class="rpt-sig-label">Laboratory Technician</div>
+        <div class="rpt-sig-name" id="s_rpt_testedBy">_____________________</div>
+        <div class="rpt-sig-date">Date: _______________</div>
+      </div>
+    </div>
+    <!-- Right col: QM + Technical Director -->
+    <div class="rpt-sig-col">
+      <div class="rpt-sig-col-header rpt-sig-col-header-std">Reviewed &amp; Approved By</div>
+      <div class="rpt-sig-row">
+        <div class="rpt-sig-item">
+          <div class="rpt-sig-line"></div>
+          <div class="rpt-sig-label">Quality Manager</div>
+          <div class="rpt-sig-name" id="s_rpt_reviewedBy">_____________________</div>
+          <div class="rpt-sig-date">Date: _______________</div>
+        </div>
+        <div class="rpt-sig-item">
+          <div class="rpt-sig-line"></div>
+          <div class="rpt-sig-label">Technical Director</div>
+          <div class="rpt-sig-name" id="s_rpt_approvedBy">_____________________</div>
+          <div class="rpt-sig-date">Date: _______________</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="rpt-footer">
+    <span>ASTM D698-12(2021) | Standard Proctor Compaction Test</span>
+    <span id="s_rpt_footerDate"></span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</div><!-- end reportContainerStd -->
+</div><!-- end finalReportTabStd -->
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+// ============================================================
+// i18n SYSTEM — Data Entry UI only
+// ============================================================
+const i18n = {
+  ar: {
+    tab_data_entry: "إدخال بيانات المعدل",
+    tab_final_report: "تقرير المعدل",
+    tab_std_entry: "إدخال بيانات القياسي",
+    tab_std_report: "تقرير القياسي",
+    btn_demo: "📋 بيانات تجريبية",
+    btn_preview: "👁 معاينة",
+    btn_print: "🖨 طباعة",
+    btn_add_row: "➕ إضافة صف",
+    btn_remove_row: "➖ حذف صف",
+    btn_reset: "🔄 إعادة ضبط",
+    sec_project: "A) معلومات المشروع والعينة",
+    sec_test_setup: "B) إعداد الاختبار",
+    sec_sample_desc: "C) وصف العينة",
+    sec_equip: "D) تتبع المعدات (ISO 17025)",
+    sec_env: "E) الظروف البيئية والفنيون",
+    sec_oversize: "F) تصحيح الكثافة للحجم الزائد",
+    sec_comp_weights: "G) جدول أوزان الدمك",
+    sec_moisture: "H) جدول محتوى الرطوبة والكثافة الجافة",
+    std_sec_project: "A) معلومات المشروع — بروكتور القياسي",
+    std_sec_test_setup: "B) إعداد اختبار بروكتور القياسي (ASTM D698)",
+    std_sec_sample: "C) وصف العينة",
+    std_sec_weights: "G) جدول أوزان الدمك — القياسي",
+    std_sec_moisture: "H) جدول محتوى الرطوبة — القياسي",
+    std_banner_title: "بروكتور القياسي — ASTM D698",
+    std_banner_sub: "Standard Proctor Compaction Test — ASTM D698-12(2021) | طاقة دمك 600 kN·m/m³",
+    std_info_title: "الفرق بين بروكتور القياسي والمعدل:",
+    std_info_text: " كتلة المدق 2.495 كغ، ارتفاع السقوط 305 مم، 3 طبقات — مقابل 4.536 كغ، 457 مم، 5 طبقات في المعدل.",
+    std_lbl_method: "الطريقة (D698)",
+    std_lbl_rammer: "كتلة المدق (كغ) — 2.495",
+    std_lbl_drop: "ارتفاع السقوط (مم) — 305",
+    std_lbl_layers: "عدد الطبقات — 3",
+    std_energy_label: "طاقة الدمك المحسوبة:",
+    std_energy_note: "(المعيار القياسي ASTM D698 ≈ 600 kN·m/m³)",
+    lbl_project_name: "اسم المشروع",
+    lbl_report_no: "رقم التقرير",
+    lbl_client: "العميل / المقاول",
+    lbl_report_date: "تاريخ التقرير",
+    lbl_sample_id: "معرّف العينة",
+    lbl_test_date: "تاريخ الاختبار",
+    lbl_location: "الموقع / رقم الحفر",
+    lbl_depth: "العمق (م)",
+    lbl_as_received_wc: "محتوى الرطوبة عند الاستلام (%)",
+    lbl_sample_mass: "كتلة العينة (كغ)",
+    lbl_method: "الطريقة",
+    lbl_procedure: "الإجراء",
+    lbl_rammer_mass: "كتلة المدق (كغ)",
+    lbl_drop_height: "ارتفاع السقوط (مم)",
+    lbl_num_layers: "عدد الطبقات",
+    lbl_blows_layer: "ضربات لكل طبقة",
+    lbl_mold_volume: "حجم القالب (سم³)",
+    lbl_mold_id: "معرّف القالب",
+    lbl_sieve: "المنخل المستخدم",
+    lbl_fraction_used: "الجزء المستخدم",
+    lbl_sample_desc: "وصف العينة",
+    lbl_uscs: "تصنيف USCS",
+    lbl_aashto: "تصنيف AASHTO",
+    lbl_gs: "الوزن النوعي Gs",
+    lbl_oversize_corr: "تصحيح الحجم الزائد",
+    lbl_slaking: "وقت النقع / المعالجة",
+    lbl_remarks: "ملاحظات",
+    lbl_balance_id: "معرّف الميزان",
+    lbl_mold_id2: "معرّف القالب",
+    lbl_rammer_id: "معرّف المدق",
+    lbl_oven_id: "معرّف الفرن",
+    lbl_calib_due: "تاريخ معايرة",
+    lbl_temp: "درجة الحرارة (°C)",
+    lbl_humidity: "الرطوبة النسبية (%)",
+    lbl_technician: "اسم الفني القائم بالاختبار",
+    lbl_reviewed_by: "مراجعة بواسطة",
+    lbl_approved_by: "اعتماد بواسطة",
+    lbl_enable_oversize: "تفعيل تصحيح الحجم الزائد",
+    lbl_pct_oversize: "نسبة الحجم الزائد المحتجز (%)",
+    lbl_gs_oversize: "الوزن النوعي للحجم الزائد",
+    lbl_corr_method: "طريقة التصحيح",
+    lbl_use_corr: "استخدام الكثافة المصححة",
+    col_trial: "المحاولة",
+    col_mold_no: "رقم القالب",
+    col_mold_soil_wt: "قالب+تربة (كغ)",
+    col_mold_wt: "وزن القالب (كغ)",
+    col_wet_soil_wt: "وزن التربة الرطبة (كغ)",
+    col_mold_vol: "حجم القالب (سم³)",
+    col_wet_density: "الكثافة الرطبة (غ/سم³)",
+    col_container_no: "رقم العلبة",
+    col_wet_dry_tare: "رطب+جاف+وعاء (غ)",
+    col_dry_tare: "جاف+وعاء (غ)",
+    col_tare_wt: "وزن الوعاء (غ)",
+    col_water_mass: "كتلة الماء (غ)",
+    col_dry_soil_mass: "كتلة التربة الجافة (غ)",
+    col_water_content: "محتوى الرطوبة (%)",
+    col_dry_density: "الكثافة الجافة (غ/سم³)",
+    col_corr_density: "الكثافة المصححة (غ/سم³)",
+    ph_project_name: "اسم المشروع",
+    ph_client: "اسم العميل",
+    ph_location: "BH-01",
+    ph_fraction: "الجزء الناعم",
+    ph_sample_desc: "وصف الطبقة / المادة",
+    ph_na: "لا ينطبق",
+    ph_remarks: "أي ملاحظات إضافية",
+    ph_tech: "اسم الفني",
+    ph_reviewed: "اسم المراجع",
+    ph_approved: "اسم المعتمد",
+    appTitle: "منصة اختبار دمك بروكتور"
+  },
+  en: {
+    tab_data_entry: "Modified — Data Entry",
+    tab_final_report: "Modified — Report",
+    tab_std_entry: "Standard — Data Entry",
+    tab_std_report: "Standard — Report",
+    btn_demo: "📋 Demo Data",
+    btn_preview: "👁 Preview",
+    btn_print: "🖨 Print",
+    btn_add_row: "➕ Add Row",
+    btn_remove_row: "➖ Remove Row",
+    btn_reset: "🔄 Reset",
+    sec_project: "A) Project & Sample Information",
+    sec_test_setup: "B) Test Setup",
+    sec_sample_desc: "C) Sample Description",
+    sec_equip: "D) Equipment Traceability (ISO 17025)",
+    sec_env: "E) Environmental Conditions & Technicians",
+    sec_oversize: "F) Oversize / Density Correction",
+    sec_comp_weights: "G) Compaction Weights Table",
+    sec_moisture: "H) Moisture Content & Dry Density Table",
+    std_sec_project: "A) Project & Sample — Standard Proctor",
+    std_sec_test_setup: "B) Test Setup — Standard Proctor (ASTM D698)",
+    std_sec_sample: "C) Sample Description",
+    std_sec_weights: "G) Compaction Weights — Standard Proctor",
+    std_sec_moisture: "H) Moisture & Dry Density — Standard Proctor",
+    std_banner_title: "Standard Proctor — ASTM D698",
+    std_banner_sub: "Standard Proctor Compaction Test — ASTM D698-12(2021) | Compaction Energy ~600 kN·m/m³",
+    std_info_title: "Key differences — Standard vs. Modified Proctor:",
+    std_info_text: " Rammer 2.495 kg, Drop 305 mm, 3 layers — vs 4.536 kg, 457 mm, 5 layers for Modified.",
+    std_lbl_method: "Method (D698)",
+    std_lbl_rammer: "Rammer Mass (kg) — 2.495",
+    std_lbl_drop: "Drop Height (mm) — 305",
+    std_lbl_layers: "Number of Layers — 3",
+    std_energy_label: "Calculated Compaction Energy:",
+    std_energy_note: "(Standard ASTM D698 ≈ 600 kN·m/m³)",
+    lbl_project_name: "Project Name",
+    lbl_report_no: "Report No.",
+    lbl_client: "Client / Contractor",
+    lbl_report_date: "Report Date",
+    lbl_sample_id: "Sample ID",
+    lbl_test_date: "Test Date",
+    lbl_location: "Location / Boring No.",
+    lbl_depth: "Depth (m)",
+    lbl_as_received_wc: "As-Received Water Content (%)",
+    lbl_sample_mass: "Sample Mass (kg)",
+    lbl_method: "Method",
+    lbl_procedure: "Procedure",
+    lbl_rammer_mass: "Rammer Mass (kg)",
+    lbl_drop_height: "Drop Height (mm)",
+    lbl_num_layers: "Number of Layers",
+    lbl_blows_layer: "Blows per Layer",
+    lbl_mold_volume: "Mold Volume (cm³)",
+    lbl_mold_id: "Mold ID",
+    lbl_sieve: "Sieve for Method",
+    lbl_fraction_used: "Fraction Used",
+    lbl_sample_desc: "Sample Description",
+    lbl_uscs: "USCS Classification",
+    lbl_aashto: "AASHTO Classification",
+    lbl_gs: "Specific Gravity Gs",
+    lbl_oversize_corr: "Oversize Correction",
+    lbl_slaking: "Slaking / Curing Time",
+    lbl_remarks: "Remarks",
+    lbl_balance_id: "Balance ID",
+    lbl_mold_id2: "Mold ID",
+    lbl_rammer_id: "Rammer ID",
+    lbl_oven_id: "Oven ID",
+    lbl_calib_due: "Calibration Due",
+    lbl_temp: "Temperature (°C)",
+    lbl_humidity: "Relative Humidity (%)",
+    lbl_technician: "Technician Name",
+    lbl_reviewed_by: "Reviewed By",
+    lbl_approved_by: "Approved By",
+    lbl_enable_oversize: "Enable Oversize Correction",
+    lbl_pct_oversize: "Percent Oversize Retained (%)",
+    lbl_gs_oversize: "Oversize Specific Gravity",
+    lbl_corr_method: "Correction Method",
+    lbl_use_corr: "Use Corrected Density in Results",
+    col_trial: "Trial No.",
+    col_mold_no: "Mold No.",
+    col_mold_soil_wt: "Mold+Soil Wt (kg)",
+    col_mold_wt: "Mold Wt (kg)",
+    col_wet_soil_wt: "Wet Soil Wt (kg)",
+    col_mold_vol: "Mold Vol. (cm³)",
+    col_wet_density: "Wet Density (g/cm³)",
+    col_container_no: "Container No.",
+    col_wet_dry_tare: "Wet+Dry+Tare (g)",
+    col_dry_tare: "Dry+Tare (g)",
+    col_tare_wt: "Tare Wt (g)",
+    col_water_mass: "Water Mass (g)",
+    col_dry_soil_mass: "Dry Soil Mass (g)",
+    col_water_content: "Water Content w (%)",
+    col_dry_density: "Dry Density ρd (g/cm³)",
+    col_corr_density: "Corrected ρd (g/cm³)",
+    ph_project_name: "Project Name",
+    ph_client: "Client Name",
+    ph_location: "BH-01",
+    ph_fraction: "Passing fraction",
+    ph_sample_desc: "Describe layer / material",
+    ph_na: "N/A",
+    ph_remarks: "Additional remarks",
+    ph_tech: "Technician Name",
+    ph_reviewed: "Reviewer Name",
+    ph_approved: "Approver Name",
+    appTitle: "Proctor Compaction Platform"
+  }
+};
+
+// ============================================================
+// APP STATE
+// ============================================================
+let currentLang = 'ar';
+let currentTestType = 'modified'; // 'modified' or 'standard'
+let currentView = 'dataEntry';    // 'dataEntry' or 'finalReport'
+let numRows = 5;       // Modified proctor rows
+let s_numRows = 5;     // Standard proctor rows
+let compactionChart = null;
+let s_compactionChart = null;
+
+// Store last calculated MDD/OMC for comparison
+let mod_mdd = null, mod_omc = null;
+let std_mdd = null, std_omc = null;
+
+// ============================================================
+// LANGUAGE SWITCHER
+// ============================================================
+function switchLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.body.classList.toggle('rtl', lang === 'ar');
+  document.body.classList.toggle('ltr', lang === 'en');
+  document.getElementById('btnAR').classList.toggle('active', lang === 'ar');
+  document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+  document.getElementById('appTitle').textContent = i18n[lang].appTitle;
+  applyTranslations();
+  rebuildTableHeaders();
+}
+
+function applyTranslations() {
+  const t = i18n[currentLang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
+  });
+}
+
+function rebuildTableHeaders() {
+  const t = i18n[currentLang];
+  // Modified weights headers
+  const wKeys = ['col_trial','col_mold_no','col_mold_soil_wt','col_mold_wt','col_wet_soil_wt','col_mold_vol','col_wet_density'];
+  document.querySelectorAll('#weightsTable thead th').forEach((th,i)=>{ if(t[wKeys[i]]) th.textContent=t[wKeys[i]]; });
+  // Modified moisture headers
+  const mKeys = ['col_trial','col_container_no','col_wet_dry_tare','col_dry_tare','col_tare_wt','col_water_mass','col_dry_soil_mass','col_water_content','col_dry_density','col_corr_density'];
+  document.querySelectorAll('#moistureTable thead th').forEach((th,i)=>{ if(t[mKeys[i]]) th.textContent=t[mKeys[i]]; });
+  // Standard weights headers
+  document.querySelectorAll('#s_weightsTable thead th').forEach((th,i)=>{ if(t[wKeys[i]]) th.textContent=t[wKeys[i]]; });
+  // Standard moisture headers
+  document.querySelectorAll('#s_moistureTable thead th').forEach((th,i)=>{ if(t[mKeys[i]]) th.textContent=t[mKeys[i]]; });
+}
+
+// ============================================================
+// TAB / VIEW SWITCHER
+// ============================================================
+function switchMainTab(testType, view) {
+  // حفظ البيانات الحالية قبل التبديل
+  if (currentTestType === 'modified') saveAllData();
+  else saveAllDataStd();
+
+  currentTestType = testType;
+  currentView = view;
+
+  // Hide all tab content
+  ['dataEntryTab','finalReportTab','dataEntryTabStd','finalReportTabStd'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+
+  // Remove active from all tab buttons
+  ['tab1Btn','tab2Btn','tab3Btn','tab4Btn'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','active-std');
+  });
+
+  if (testType === 'modified') {
+    if (view === 'dataEntry') {
+      document.getElementById('dataEntryTab').classList.add('active');
+      document.getElementById('tab1Btn').classList.add('active');
+    } else {
+      document.getElementById('finalReportTab').classList.add('active');
+      document.getElementById('tab2Btn').classList.add('active');
+      updateReport();
+    }
+  } else {
+    if (view === 'dataEntry') {
+      document.getElementById('dataEntryTabStd').classList.add('active');
+      document.getElementById('tab3Btn').classList.add('active-std');
+    } else {
+      document.getElementById('finalReportTabStd').classList.add('active');
+      document.getElementById('tab4Btn').classList.add('active-std');
+      updateReportStd();
+    }
+  }
+}
+
+function previewCurrentReport() {
+  if (currentTestType === 'modified') {
+    switchMainTab('modified','finalReport');
+  } else {
+    switchMainTab('standard','finalReport');
+  }
+}
+
+// ============================================================
+// OVERSIZE TOGGLES
+// ============================================================
+function toggleOversize() {
+  const en = document.getElementById('enableOversize').checked;
+  document.getElementById('oversizeFields').classList.toggle('hidden', !en);
+  recalcAll();
+}
+function toggleOversizeStd() {
+  const en = document.getElementById('s_enableOversize').checked;
+  document.getElementById('s_oversizeFields').classList.toggle('hidden', !en);
+  recalcAllStd();
+}
+
+// ============================================================
+// COMPACTION ENERGY CALCULATION (Standard Proctor display)
+// ============================================================
+function calcCompactionEnergy(prefix) {
+  const W = parseFloat(document.getElementById(prefix+'rammerMass')?.value) || 0; // kg
+  const H = parseFloat(document.getElementById(prefix+'dropHeight')?.value) || 0; // mm
+  const N_blows = parseFloat(document.getElementById(prefix+'blowsLayer')?.value) || 0;
+  const N_layers = parseFloat(document.getElementById(prefix+'numLayers')?.value) || 0;
+  const V = parseFloat(document.getElementById(prefix+'moldVolume')?.value) || 0; // cm³
+  if (W <= 0 || H <= 0 || N_blows <= 0 || N_layers <= 0 || V <= 0) return null;
+  // Energy = (W * g * H * N_blows * N_layers) / V
+  // W in kg, H in m, V in m³
+  const energy = (W * 9.81 * (H/1000) * N_blows * N_layers) / (V / 1e6); // N·m/m³ = J/m³ = Pa
+  return energy / 1000; // kN·m/m³
+}
+
+function updateEnergyDisplay() {
+  const e = calcCompactionEnergy('s_');
+  const el = document.getElementById('s_compactionEnergy');
+  if (el) el.textContent = e ? ` ${e.toFixed(0)} kN·m/m³` : ' — kN·m/m³';
+}
+
+// ============================================================
+// TABLE BUILDERS — MODIFIED PROCTOR
+// ============================================================
+function buildTables() {
+  buildWeightsTable();
+  buildMoistureTable();
+}
+
+function buildWeightsTable() {
+  const tbody = document.getElementById('weightsTableBody');
+  tbody.innerHTML = '';
+  for (let i = 0; i < numRows; i++) {
+    const tr = document.createElement('tr');
+    const defVol = document.getElementById('moldVolume').value || '944.0';
+    tr.innerHTML = `
+      <td><input type="text" id="w_trial_${i}" value="${i+1}" readonly></td>
+      <td><input type="text" id="w_moldNo_${i}" placeholder="M-0${i+1}"></td>
+      <td><input type="number" id="w_moldSoil_${i}" step="0.001" placeholder="0.000" oninput="calcWeightRow(${i})"></td>
+      <td><input type="number" id="w_moldWt_${i}" step="0.001" placeholder="0.000" oninput="calcWeightRow(${i})"></td>
+      <td><input type="number" id="w_wetSoil_${i}" step="0.001" readonly></td>
+      <td><input type="number" id="w_moldVol_${i}" step="0.1" value="${defVol}" oninput="calcWeightRow(${i})"></td>
+      <td><input type="number" id="w_wetDens_${i}" step="0.0001" readonly></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function buildMoistureTable() {
+  const tbody = document.getElementById('moistureTableBody');
+  tbody.innerHTML = '';
+  for (let i = 0; i < numRows; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${i+1}" readonly></td>
+      <td><input type="text" id="m_contNo_${i}" placeholder="C-0${i+1}"></td>
+      <td><input type="number" id="m_wetDryTare_${i}" step="0.01" placeholder="0.00" oninput="calcMoistRow(${i})"></td>
+      <td><input type="number" id="m_dryTare_${i}" step="0.01" placeholder="0.00" oninput="calcMoistRow(${i})"></td>
+      <td><input type="number" id="m_tare_${i}" step="0.01" placeholder="0.00" oninput="calcMoistRow(${i})"></td>
+      <td><input type="number" id="m_waterMass_${i}" step="0.01" readonly></td>
+      <td><input type="number" id="m_drySoilMass_${i}" step="0.01" readonly></td>
+      <td><input type="number" id="m_wc_${i}" step="0.01" readonly></td>
+      <td><input type="number" id="m_dryDens_${i}" step="0.0001" readonly></td>
+      <td><input type="number" id="m_corrDens_${i}" step="0.0001" readonly></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ============================================================
+// TABLE BUILDERS — STANDARD PROCTOR
+// ============================================================
+function buildTablesStd() {
+  buildWeightsTableStd();
+  buildMoistureTableStd();
+}
+
+function buildWeightsTableStd() {
+  const tbody = document.getElementById('s_weightsTableBody');
+  tbody.innerHTML = '';
+  for (let i = 0; i < s_numRows; i++) {
+    const defVol = document.getElementById('s_moldVolume').value || '944.0';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${i+1}" readonly></td>
+      <td><input type="text" id="sw_moldNo_${i}" placeholder="M-STD-0${i+1}"></td>
+      <td><input type="number" id="sw_moldSoil_${i}" step="0.001" placeholder="0.000" oninput="calcWeightRowStd(${i})"></td>
+      <td><input type="number" id="sw_moldWt_${i}" step="0.001" placeholder="0.000" oninput="calcWeightRowStd(${i})"></td>
+      <td><input type="number" id="sw_wetSoil_${i}" step="0.001" readonly></td>
+      <td><input type="number" id="sw_moldVol_${i}" step="0.1" value="${defVol}" oninput="calcWeightRowStd(${i})"></td>
+      <td><input type="number" id="sw_wetDens_${i}" step="0.0001" readonly></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function buildMoistureTableStd() {
+  const tbody = document.getElementById('s_moistureTableBody');
+  tbody.innerHTML = '';
+  for (let i = 0; i < s_numRows; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${i+1}" readonly></td>
+      <td><input type="text" id="sm_contNo_${i}" placeholder="C-STD-0${i+1}"></td>
+      <td><input type="number" id="sm_wetDryTare_${i}" step="0.01" placeholder="0.00" oninput="calcMoistRowStd(${i})"></td>
+      <td><input type="number" id="sm_dryTare_${i}" step="0.01" placeholder="0.00" oninput="calcMoistRowStd(${i})"></td>
+      <td><input type="number" id="sm_tare_${i}" step="0.01" placeholder="0.00" oninput="calcMoistRowStd(${i})"></td>
+      <td><input type="number" id="sm_waterMass_${i}" step="0.01" readonly></td>
+      <td><input type="number" id="sm_drySoilMass_${i}" step="0.01" readonly></td>
+      <td><input type="number" id="sm_wc_${i}" step="0.01" readonly></td>
+      <td><input type="number" id="sm_dryDens_${i}" step="0.0001" readonly></td>
+      <td><input type="number" id="sm_corrDens_${i}" step="0.0001" readonly></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ============================================================
+// CALCULATIONS — MODIFIED PROCTOR
+// ============================================================
+function calcWeightRow(i) {
+  const moldSoil = parseFloat(document.getElementById(`w_moldSoil_${i}`)?.value) || 0;
+  const moldWt   = parseFloat(document.getElementById(`w_moldWt_${i}`)?.value) || 0;
+  const moldVol  = parseFloat(document.getElementById(`w_moldVol_${i}`)?.value) || parseFloat(document.getElementById('moldVolume').value) || 944;
+  const wetSoil  = moldSoil - moldWt;
+  const wetDens  = moldVol > 0 ? (wetSoil * 1000) / moldVol : 0;
+  setVal(`w_wetSoil_${i}`, wetSoil > 0 ? wetSoil.toFixed(3) : '');
+  setVal(`w_wetDens_${i}`, wetDens > 0 ? wetDens.toFixed(4) : '');
+  calcMoistRow(i);
+  if (currentView==='finalReport') updateReport();
+}
+
+function calcMoistRow(i) {
+  const wetDryTare = parseFloat(document.getElementById(`m_wetDryTare_${i}`)?.value) || 0;
+  const dryTare    = parseFloat(document.getElementById(`m_dryTare_${i}`)?.value) || 0;
+  const tare       = parseFloat(document.getElementById(`m_tare_${i}`)?.value) || 0;
+  const waterMass  = wetDryTare - dryTare;
+  const drySoilMass = dryTare - tare;
+  const wc = drySoilMass > 0 ? (waterMass / drySoilMass) * 100 : 0;
+  const wetDens = parseFloat(document.getElementById(`w_wetDens_${i}`)?.value) || 0;
+  const dryDens = (1 + wc/100) > 0 && wetDens > 0 ? wetDens / (1 + wc/100) : 0;
+  setVal(`m_waterMass_${i}`, waterMass > 0 ? waterMass.toFixed(2) : '');
+  setVal(`m_drySoilMass_${i}`, drySoilMass > 0 ? drySoilMass.toFixed(2) : '');
+  setVal(`m_wc_${i}`, wc > 0 ? wc.toFixed(2) : '');
+  setVal(`m_dryDens_${i}`, dryDens > 0 ? dryDens.toFixed(4) : '');
+  const corrDens = calcCorrectedDensity(dryDens, false);
+  setVal(`m_corrDens_${i}`, corrDens > 0 ? corrDens.toFixed(4) : '');
+  if (currentView === 'finalReport') updateReport();
+}
+
+function calcCorrectedDensity(dryDens, isStd) {
+  const prefix = isStd ? 's_' : '';
+  const enableEl = document.getElementById(prefix+'enableOversize');
+  if (!enableEl || !enableEl.checked) return dryDens;
+  const pctOver = parseFloat(document.getElementById(prefix+'pctOversize')?.value) || 0;
+  const gsOver  = parseFloat(document.getElementById(prefix+'gsOversize')?.value) || 2.75;
+  if (pctOver <= 0 || pctOver >= 100 || dryDens <= 0) return dryDens;
+  const Pc = pctOver / 100;
+  const Pf = 1 - Pc;
+  return 1 / (Pf / dryDens + Pc / gsOver);
+}
+
+function recalcAll() {
+  for (let i = 0; i < numRows; i++) calcWeightRow(i);
+}
+
+// ============================================================
+// CALCULATIONS — STANDARD PROCTOR
+// ============================================================
+function calcWeightRowStd(i) {
+  const moldSoil = parseFloat(document.getElementById(`sw_moldSoil_${i}`)?.value) || 0;
+  const moldWt   = parseFloat(document.getElementById(`sw_moldWt_${i}`)?.value) || 0;
+  const moldVol  = parseFloat(document.getElementById(`sw_moldVol_${i}`)?.value) || parseFloat(document.getElementById('s_moldVolume').value) || 944;
+  const wetSoil  = moldSoil - moldWt;
+  const wetDens  = moldVol > 0 ? (wetSoil * 1000) / moldVol : 0;
+  setVal(`sw_wetSoil_${i}`, wetSoil > 0 ? wetSoil.toFixed(3) : '');
+  setVal(`sw_wetDens_${i}`, wetDens > 0 ? wetDens.toFixed(4) : '');
+  calcMoistRowStd(i);
+  if (currentView==='finalReport') updateReportStd();
+}
+
+function calcMoistRowStd(i) {
+  const wetDryTare  = parseFloat(document.getElementById(`sm_wetDryTare_${i}`)?.value) || 0;
+  const dryTare     = parseFloat(document.getElementById(`sm_dryTare_${i}`)?.value) || 0;
+  const tare        = parseFloat(document.getElementById(`sm_tare_${i}`)?.value) || 0;
+  const waterMass   = wetDryTare - dryTare;
+  const drySoilMass = dryTare - tare;
+  const wc = drySoilMass > 0 ? (waterMass / drySoilMass) * 100 : 0;
+  const wetDens = parseFloat(document.getElementById(`sw_wetDens_${i}`)?.value) || 0;
+  const dryDens = (1 + wc/100) > 0 && wetDens > 0 ? wetDens / (1 + wc/100) : 0;
+  setVal(`sm_waterMass_${i}`, waterMass > 0 ? waterMass.toFixed(2) : '');
+  setVal(`sm_drySoilMass_${i}`, drySoilMass > 0 ? drySoilMass.toFixed(2) : '');
+  setVal(`sm_wc_${i}`, wc > 0 ? wc.toFixed(2) : '');
+  setVal(`sm_dryDens_${i}`, dryDens > 0 ? dryDens.toFixed(4) : '');
+  const corrDens = calcCorrectedDensity(dryDens, true);
+  setVal(`sm_corrDens_${i}`, corrDens > 0 ? corrDens.toFixed(4) : '');
+  if (currentView === 'finalReport') updateReportStd();
+}
+
+function recalcAllStd() {
+  for (let i = 0; i < s_numRows; i++) calcWeightRowStd(i);
+}
+
+// ============================================================
+// ADD / REMOVE ROWS
+// ============================================================
+function addRow() {
+  if (currentTestType === 'modified') {
+    saveAllData();
+    numRows++;
+    buildTables();
+    restoreAllData();
+    recalcAll();
+    updateReport();
+  } else {
+    saveAllDataStd();
+    s_numRows++;
+    buildTablesStd();
+    restoreAllDataStd();
+    recalcAllStd();
+    updateReportStd();
+  }
+}
+function removeRow() {
+  if (currentTestType === 'modified') {
+    if (numRows <= 2) return;
+    saveAllData();
+    numRows--;
+    buildTables();
+    restoreAllData();
+    recalcAll();
+    updateReport();
+  } else {
+    if (s_numRows <= 2) return;
+    saveAllDataStd();
+    s_numRows--;
+    buildTablesStd();
+    restoreAllDataStd();
+    recalcAllStd();
+    updateReportStd();
+  }
+}
+
+let savedData = {};
+function saveAllData() {
+  savedData = {};
+  for (let i = 0; i < numRows + 5; i++) {
+    ['w_moldNo','w_moldSoil','w_moldWt','w_moldVol','m_contNo','m_wetDryTare','m_dryTare','m_tare'].forEach(prefix => {
+      const el = document.getElementById(`${prefix}_${i}`);
+      if (el) savedData[`${prefix}_${i}`] = el.value;
+    });
+  }
+}
+function restoreAllData() {
+  Object.keys(savedData).forEach(key => {
+    const el = document.getElementById(key);
+    if (el && !el.readOnly) el.value = savedData[key];
+  });
+}
+
+let savedDataStd = {};
+function saveAllDataStd() {
+  savedDataStd = {};
+  for (let i = 0; i < s_numRows + 5; i++) {
+    ['sw_moldNo','sw_moldSoil','sw_moldWt','sw_moldVol','sm_contNo','sm_wetDryTare','sm_dryTare','sm_tare'].forEach(prefix => {
+      const el = document.getElementById(`${prefix}_${i}`);
+      if (el) savedDataStd[`${prefix}_${i}`] = el.value;
+    });
+  }
+}
+function restoreAllDataStd() {
+  Object.keys(savedDataStd).forEach(key => {
+    const el = document.getElementById(key);
+    if (el && !el.readOnly) el.value = savedDataStd[key];
+  });
+}
+
+// ============================================================
+// POLYNOMIAL FIT — Quadratic for MDD/OMC
+// ============================================================
+function fitParabola(xs, ys) {
+  const n = xs.length;
+  if (n < 3) return null;
+  let S0=n, S1=0, S2=0, S3=0, S4=0, T0=0, T1=0, T2=0;
+  for (let i=0; i<n; i++) {
+    const x=xs[i], y=ys[i];
+    S1+=x; S2+=x*x; S3+=x*x*x; S4+=x*x*x*x;
+    T0+=y; T1+=x*y; T2+=x*x*y;
+  }
+  const A = [[S0,S1,S2],[S1,S2,S3],[S2,S3,S4]];
+  const B = [T0,T1,T2];
+  const coeffs = gaussElim(A,B);
+  if (!coeffs) return null;
+  const [c,b,a] = coeffs;
+  if (a >= 0) return null;
+  const xPeak = -b/(2*a);
+  const yPeak = a*xPeak*xPeak + b*xPeak + c;
+  return { a, b, c, xPeak, yPeak };
+}
+
+function gaussElim(A, B) {
+  const n = A.length;
+  const M = A.map((row,i)=>[...row, B[i]]);
+  for (let col=0; col<n; col++) {
+    let maxRow = col;
+    for (let row=col+1; row<n; row++) if (Math.abs(M[row][col])>Math.abs(M[maxRow][col])) maxRow=row;
+    [M[col],M[maxRow]] = [M[maxRow],M[col]];
+    if (Math.abs(M[col][col]) < 1e-12) return null;
+    for (let row=col+1; row<n; row++) {
+      const f = M[row][col]/M[col][col];
+      for (let k=col; k<=n; k++) M[row][k] -= f*M[col][k];
+    }
+  }
+  const x = new Array(n).fill(0);
+  for (let i=n-1; i>=0; i--) {
+    x[i] = M[i][n];
+    for (let k=i+1; k<n; k++) x[i] -= M[i][k]*x[k];
+    x[i] /= M[i][i];
+  }
+  return x;
+}
+
+function zeroAirVoids(w, Gs) {
+  if (w <= 0 || Gs <= 0) return null;
+  const rho_w = 1.0; // g/cm³
+  return (Gs * rho_w) / (1 + Gs * w / 100);
+}
+
+// ============================================================
+// CHART MODULE
+// ============================================================
+function updateChart(wcArr, ddArr, fit, Gs, canvasId, chartRef, colorPrimary, colorZAV, corrArr, corrFit) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  if (chartRef) chartRef.destroy();
+
+  const minW = Math.max(0, Math.min(...wcArr) - 3);
+  const maxW = Math.max(...wcArr) + 3;
+  const wRange = [];
+  for (let w = minW; w <= maxW; w += 0.5) wRange.push(parseFloat(w.toFixed(2)));
+
+  let curvePts = [];
+  if (fit) curvePts = wRange.map(w => ({x: w, y: parseFloat((fit.a*w*w + fit.b*w + fit.c).toFixed(4))}));
+
+  let corrCurvePts = [];
+  if (corrFit) corrCurvePts = wRange.map(w => ({x: w, y: parseFloat((corrFit.a*w*w + corrFit.b*w + corrFit.c).toFixed(4))}));
+
+  const zavPts  = wRange
+    .map(w => { const z=zeroAirVoids(w,Gs); return z?{x:w,y:parseFloat(z.toFixed(4))}:null; })
+    .filter(Boolean);
+  const zav95   = wRange
+    .map(w => { const z=zeroAirVoids(w,Gs); return z?{x:w,y:parseFloat((0.95*z).toFixed(4))}:null; })
+    .filter(Boolean);
+  const mddPt   = corrFit && corrFit.xPeak > 0
+    ? [{x: parseFloat(corrFit.xPeak.toFixed(2)), y: parseFloat(corrFit.yPeak.toFixed(4))}]
+    : (fit ? [{x: parseFloat(fit.xPeak.toFixed(2)), y: parseFloat(fit.yPeak.toFixed(4))}] : []);
+  const scatterPts = wcArr.map((w,i) => ({x: parseFloat(w.toFixed(2)), y: parseFloat(ddArr[i].toFixed(4))}));
+  const corrScatterPts = corrArr ? wcArr.map((w,i) => ({x: parseFloat(w.toFixed(2)), y: parseFloat(corrArr[i].toFixed(4))})) : [];
+
+  const datasets = [
+    { label:'Uncorrected Points', type:'scatter', data:scatterPts, backgroundColor:colorPrimary+'99', pointRadius:5, order:5 }
+  ];
+
+  // Show corrected points on top if available
+  if (corrScatterPts.length > 0) {
+    datasets.push({ label:'Corrected Points (D4718)', type:'scatter', data:corrScatterPts, backgroundColor:'#059669', borderColor:'#fff', borderWidth:1.5, pointRadius:6, order:4 });
+  }
+
+  // Uncorrected curve (dashed, lighter)
+  if (curvePts.length > 0) {
+    datasets.push({ label:'Uncorrected Curve', type:'line', data:curvePts, borderColor:colorPrimary+'88', backgroundColor:'transparent', borderWidth:1.5, borderDash:[5,4], pointRadius:0, tension:0.3, order:3 });
+  }
+
+  // Corrected curve on top (solid, prominent)
+  if (corrCurvePts.length > 0) {
+    datasets.push({ label:'Corrected Curve (D4718)', type:'line', data:corrCurvePts, borderColor:'#059669', backgroundColor:'transparent', borderWidth:2.5, pointRadius:0, tension:0.3, order:2 });
+  } else if (curvePts.length > 0 && !corrArr) {
+    // No correction — show single solid curve
+    datasets[datasets.length-1].borderColor = colorPrimary;
+    datasets[datasets.length-1].borderWidth = 2;
+    datasets[datasets.length-1].borderDash = [];
+    datasets[datasets.length-1].label = 'Compaction Curve';
+  }
+
+  datasets.push({ label:'Zero Air Voids (S=100%)', type:'line', data:zavPts, borderColor:colorZAV, backgroundColor:'transparent', borderWidth:1.5, borderDash:[6,3], pointRadius:0, tension:0, order:1 });
+  datasets.push({ label:'95% Saturation Line', type:'line', data:zav95, borderColor:'#d97706', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,4], pointRadius:0, tension:0, order:1 });
+  if (mddPt.length > 0) {
+    datasets.push({ label:'MDD / OMC', type:'scatter', data:mddPt, backgroundColor:'#dc2626', borderColor:'#fff', borderWidth:2, pointRadius:8, pointStyle:'star', order:0 });
+  }
+
+  const chart = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 0 },
+      devicePixelRatio: 2,
+      plugins: {
+        legend: { position:'top', labels:{font:{size:9}, boxWidth:20, padding:8} },
+        tooltip: { callbacks: { label: ctx => `(w=${ctx.parsed.x}%, ρd=${ctx.parsed.y} g/cm³)` } }
+      },
+      scales: {
+        x: { type:'linear', title:{display:true, text:'Molding Water Content, w (%)', font:{size:10,weight:'bold'}}, ticks:{font:{size:9}}, grid:{color:'#e5e7eb'} },
+        y: { title:{display:true, text:'Dry Density, ρd (g/cm³)', font:{size:10,weight:'bold'}}, ticks:{font:{size:9}}, grid:{color:'#e5e7eb'} }
+      }
+    }
+  });
+  return chart;
+}
+
+// ============================================================
+// REPORT SYNC — MODIFIED PROCTOR
+// ============================================================
+function getVal(id) { const el=document.getElementById(id); return el?(el.value||'—'):'—'; }
+function setText(id, val) { const el=document.getElementById(id); if(el) el.textContent=val||'—'; }
+function formatDate(d) { if(!d||d==='—') return '—'; try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch(e){return d;} }
+
+function updateReport() {
+  // Section 1
+  setText('rpt_reportNo', getVal('reportNo'));
+  setText('rpt_project', getVal('projectName'));
+  setText('rpt_reportDate', formatDate(getVal('reportDate')));
+  setText('rpt_reportNo2', getVal('reportNo'));
+  setText('rpt_projectName', getVal('projectName'));
+  setText('rpt_client', getVal('client'));
+  setText('rpt_reportDate2', formatDate(getVal('reportDate')));
+  setText('rpt_sampleId', getVal('sampleId'));
+  setText('rpt_testDate', formatDate(getVal('testDate')));
+  setText('rpt_location', getVal('location'));
+  setText('rpt_depth', getVal('depth')!=='—'?getVal('depth')+' m':'—');
+  setText('rpt_asRecWC', getVal('asReceivedWC')!=='—'?getVal('asReceivedWC')+' %':'—');
+  setText('rpt_sampleMass', getVal('sampleMass')!=='—'?getVal('sampleMass')+' kg':'—');
+  // Section 2
+  setText('rpt_method', getVal('method'));
+  setText('rpt_procedure', getVal('procedure'));
+  setText('rpt_rammerMass', getVal('rammerMass')!=='—'?getVal('rammerMass')+' kg':'—');
+  setText('rpt_dropHeight', getVal('dropHeight')!=='—'?getVal('dropHeight')+' mm':'—');
+  setText('rpt_numLayers', getVal('numLayers'));
+  setText('rpt_blowsLayer', getVal('blowsLayer'));
+  setText('rpt_moldVolume', getVal('moldVolume')!=='—'?getVal('moldVolume')+' cm³':'—');
+  setText('rpt_moldId', getVal('moldId'));
+  setText('rpt_sieve', getVal('sieveUsed'));
+  setText('rpt_fraction', getVal('fractionUsed'));
+  // Section 3
+  setText('rpt_sampleDesc', getVal('sampleDesc'));
+  setText('rpt_gs', getVal('gsValue'));
+  setText('rpt_uscs', getVal('uscs'));
+  setText('rpt_aashto', getVal('aashto'));
+  setText('rpt_oversizeCorr', document.getElementById('enableOversize').checked
+    ? `Yes — ${getVal('pctOversize')}% oversize, Gs=${getVal('gsOversize')} (${getVal('corrMethod')})` : 'Not Applied');
+  setText('rpt_slaking', getVal('slakingTime'));
+  // Section 4
+  setText('rpt_temp', getVal('envTemp')!=='—'?getVal('envTemp')+' °C':'—');
+  setText('rpt_humidity', getVal('envHumidity')!=='—'?getVal('envHumidity')+' %':'—');
+  setText('rpt_tech', getVal('techName'));
+  setText('rpt_calibDue2', formatDate(getVal('calibDue')));
+  setText('rpt_balanceId', getVal('balanceId'));
+  setText('rpt_moldId2', getVal('moldId2')!=='—'?getVal('moldId2'):getVal('moldId'));
+  setText('rpt_rammerId', getVal('rammerId'));
+  setText('rpt_ovenId', getVal('ovenId'));
+  // Section 5
+  buildReportWeightsTable();
+  buildReportMoistureTable();
+  // Summary
+  setText('rpt_uscs2', getVal('uscs'));
+  setText('rpt_aashto2', getVal('aashto'));
+  setText('rpt_gs2', getVal('gsValue'));
+  // Remarks & Sigs
+  setText('rpt_remarks', getVal('remarks'));
+  setText('rpt_testedBy', getVal('techName'));
+  setText('rpt_reviewedBy', getVal('reviewedBy'));
+  setText('rpt_approvedBy', getVal('approvedBy'));
+  const fe = document.getElementById('rpt_footerDate');
+  if(fe) fe.textContent = 'Generated: ' + new Date().toLocaleDateString('en-GB');
+
+  // MDD/OMC
+  const wcArr=[], ddArr=[];
+  for (let i=0; i<numRows; i++) {
+    const useCorr = document.getElementById('enableOversize').checked && document.getElementById('useCorrDensity').checked;
+    const wc = parseFloat(document.getElementById(`m_wc_${i}`)?.value);
+    const dd = useCorr ? parseFloat(document.getElementById(`m_corrDens_${i}`)?.value) : parseFloat(document.getElementById(`m_dryDens_${i}`)?.value);
+    if (!isNaN(wc)&&!isNaN(dd)&&wc>0&&dd>0) { wcArr.push(wc); ddArr.push(dd); }
+  }
+  const warningEl = document.getElementById('rpt_dataWarning');
+  if (wcArr.length < 3) {
+    if (warningEl) {
+      warningEl.textContent = `⚠ Only ${wcArr.length} valid data point(s). Minimum 3 required for curve fitting.`;
+      warningEl.style.display = 'block';
+    }
+  } else {
+    if (warningEl) warningEl.style.display = 'none';
+  }
+  let fit = wcArr.length>=3 ? fitParabola(wcArr,ddArr) : null;
+  if (fit&&fit.xPeak>0&&fit.yPeak>0) {
+    setText('rpt_mdd', fit.yPeak.toFixed(3));
+    setText('rpt_omc', fit.xPeak.toFixed(1));
+    setText('rpt_fitNote','');
+    mod_mdd = fit.yPeak;
+    mod_omc = fit.xPeak;
+  } else if (ddArr.length >= 1) {
+    const maxIdx = ddArr.indexOf(Math.max(...ddArr));
+    setText('rpt_mdd', ddArr[maxIdx].toFixed(3) + ' *');
+    setText('rpt_omc', wcArr[maxIdx].toFixed(1) + ' *');
+    setText('rpt_fitNote','* Insufficient points for curve fit — peak point used');
+    mod_mdd = ddArr[maxIdx];
+    mod_omc = wcArr[maxIdx];
+  } else {
+    setText('rpt_mdd','—'); setText('rpt_omc','—');
+    setText('rpt_fitNote','Enter at least 3 test points to calculate MDD/OMC');
+    mod_mdd = null; mod_omc = null;
+  }
+  const corrLabel = document.getElementById('enableOversize')?.checked &&
+                    document.getElementById('useCorrDensity')?.checked
+                    ? '(Corrected per ASTM D4718)' : '(Uncorrected)';
+  setText('rpt_densityNote', corrLabel);
+  const Gs = parseFloat(document.getElementById('gsValue').value)||2.68;
+  if (wcArr.length>0) {
+    const oversizeOn = document.getElementById('enableOversize').checked;
+    const useCorrOn  = document.getElementById('useCorrDensity').checked;
+    if (oversizeOn && useCorrOn) {
+      // Build uncorrected arrays too
+      const wcRaw=[], ddRaw=[], ddCorr=[];
+      for (let i=0; i<numRows; i++) {
+        const wc = parseFloat(document.getElementById(`m_wc_${i}`)?.value);
+        const dd = parseFloat(document.getElementById(`m_dryDens_${i}`)?.value);
+        const dc = parseFloat(document.getElementById(`m_corrDens_${i}`)?.value);
+        if (!isNaN(wc)&&!isNaN(dd)&&wc>0&&dd>0) { wcRaw.push(wc); ddRaw.push(dd); ddCorr.push(isNaN(dc)?dd:dc); }
+      }
+      const rawFit  = wcRaw.length>=3 ? fitParabola(wcRaw,ddRaw) : null;
+      const corrFit = wcRaw.length>=3 ? fitParabola(wcRaw,ddCorr) : null;
+      compactionChart = updateChart(wcRaw, ddRaw, rawFit, Gs, 'compactionChart', compactionChart, '#1e3a5f', '#dc2626', ddCorr, corrFit);
+    } else {
+      compactionChart = updateChart(wcArr, ddArr, fit, Gs, 'compactionChart', compactionChart, '#1e3a5f', '#dc2626');
+    }
+  }
+}
+
+function buildReportWeightsTable() {
+  const tbody = document.getElementById('rpt_weightsBody');
+  tbody.innerHTML = '';
+  for (let i=0; i<numRows; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${document.getElementById(`w_moldNo_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`w_moldSoil_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`w_moldWt_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`w_wetSoil_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`w_moldVol_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`w_wetDens_${i}`)?.value||'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function buildReportMoistureTable() {
+  const tbody = document.getElementById('rpt_moistureBody');
+  tbody.innerHTML = '';
+  for (let i=0; i<numRows; i++) {
+    const useCorr = document.getElementById('enableOversize').checked && document.getElementById('useCorrDensity').checked;
+    const corrDens = document.getElementById(`m_corrDens_${i}`)?.value;
+    const dryDens  = document.getElementById(`m_dryDens_${i}`)?.value;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${document.getElementById(`m_contNo_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`m_wetDryTare_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`m_dryTare_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`m_tare_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`m_waterMass_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`m_drySoilMass_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`m_wc_${i}`)?.value||'—'}</td>
+      <td>${dryDens||'—'}</td>
+      <td>${useCorr?(corrDens||dryDens||'—'):dryDens||'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ============================================================
+// REPORT SYNC — STANDARD PROCTOR
+// ============================================================
+function getSVal(id) { const el=document.getElementById(id); return el?(el.value||'—'):'—'; }
+function setTextS(id, val) { const el=document.getElementById(id); if(el) el.textContent=val||'—'; }
+
+function updateReportStd() {
+  // Section 1
+  setTextS('s_rpt_reportNo', getSVal('s_reportNo'));
+  setTextS('s_rpt_project', getSVal('s_projectName'));
+  setTextS('s_rpt_reportDate', formatDate(getSVal('s_reportDate')));
+  setTextS('s_rpt_reportNo2', getSVal('s_reportNo'));
+  setTextS('s_rpt_projectName', getSVal('s_projectName'));
+  setTextS('s_rpt_client', getSVal('s_client'));
+  setTextS('s_rpt_reportDate2', formatDate(getSVal('s_reportDate')));
+  setTextS('s_rpt_sampleId', getSVal('s_sampleId'));
+  setTextS('s_rpt_testDate', formatDate(getSVal('s_testDate')));
+  setTextS('s_rpt_location', getSVal('s_location'));
+  setTextS('s_rpt_depth', getSVal('s_depth')!=='—'?getSVal('s_depth')+' m':'—');
+  setTextS('s_rpt_asRecWC', getSVal('s_asReceivedWC')!=='—'?getSVal('s_asReceivedWC')+' %':'—');
+  setTextS('s_rpt_sampleMass', getSVal('s_sampleMass')!=='—'?getSVal('s_sampleMass')+' kg':'—');
+  // Section 2
+  setTextS('s_rpt_method', getSVal('s_method'));
+  setTextS('s_rpt_procedure', getSVal('s_procedure'));
+  setTextS('s_rpt_rammerMass', getSVal('s_rammerMass')!=='—'?getSVal('s_rammerMass')+' kg':'—');
+  setTextS('s_rpt_dropHeight', getSVal('s_dropHeight')!=='—'?getSVal('s_dropHeight')+' mm':'—');
+  setTextS('s_rpt_numLayers', getSVal('s_numLayers'));
+  setTextS('s_rpt_blowsLayer', getSVal('s_blowsLayer'));
+  setTextS('s_rpt_moldVolume', getSVal('s_moldVolume')!=='—'?getSVal('s_moldVolume')+' cm³':'—');
+  setTextS('s_rpt_moldId', getSVal('s_moldId'));
+  setTextS('s_rpt_sieve', getSVal('s_sieveUsed'));
+  const e = calcCompactionEnergy('s_');
+  setTextS('s_rpt_energy', e ? e.toFixed(0)+' kN·m/m³' : '—');
+  setTextS('s_rpt_energy2', e ? e.toFixed(0)+' kN·m/m³' : '—');
+  // Section 3
+  setTextS('s_rpt_sampleDesc', getSVal('s_sampleDesc'));
+  setTextS('s_rpt_gs', getSVal('s_gsValue'));
+  setTextS('s_rpt_uscs', getSVal('s_uscs'));
+  setTextS('s_rpt_aashto', getSVal('s_aashto'));
+  setTextS('s_rpt_oversizeCorr', document.getElementById('s_enableOversize').checked
+    ? `Yes — ${getSVal('s_pctOversize')}% oversize, Gs=${getSVal('s_gsOversize')} (${getSVal('s_corrMethod')})` : 'Not Applied');
+  setTextS('s_rpt_slaking', getSVal('s_slakingTime'));
+  // Section 4
+  setTextS('s_rpt_temp', getSVal('s_envTemp')!=='—'?getSVal('s_envTemp')+' °C':'—');
+  setTextS('s_rpt_humidity', getSVal('s_envHumidity')!=='—'?getSVal('s_envHumidity')+' %':'—');
+  setTextS('s_rpt_tech', getSVal('s_techName'));
+  setTextS('s_rpt_calibDue', formatDate(getSVal('s_calibDue')));
+  setTextS('s_rpt_balanceId', getSVal('s_balanceId'));
+  setTextS('s_rpt_moldId2', getSVal('s_moldId2')!=='—'?getSVal('s_moldId2'):getSVal('s_moldId'));
+  setTextS('s_rpt_rammerId', getSVal('s_rammerId'));
+  setTextS('s_rpt_ovenId', getSVal('s_ovenId'));
+  // Section 5
+  buildReportWeightsTableStd();
+  buildReportMoistureTableStd();
+  // Summary
+  setTextS('s_rpt_uscs2', getSVal('s_uscs'));
+  setTextS('s_rpt_aashto2', getSVal('s_aashto'));
+  // Remarks & Sigs
+  setTextS('s_rpt_remarks', getSVal('s_remarks'));
+  setTextS('s_rpt_testedBy', getSVal('s_techName'));
+  setTextS('s_rpt_reviewedBy', getSVal('s_reviewedBy'));
+  setTextS('s_rpt_approvedBy', getSVal('s_approvedBy'));
+  const fe = document.getElementById('s_rpt_footerDate');
+  if(fe) fe.textContent = 'Generated: '+new Date().toLocaleDateString('en-GB');
+
+  // MDD/OMC
+  const wcArr=[], ddArr=[];
+  for (let i=0; i<s_numRows; i++) {
+    const useCorr = document.getElementById('s_enableOversize').checked && document.getElementById('s_useCorrDensity').checked;
+    const wc = parseFloat(document.getElementById(`sm_wc_${i}`)?.value);
+    const dd = useCorr ? parseFloat(document.getElementById(`sm_corrDens_${i}`)?.value) : parseFloat(document.getElementById(`sm_dryDens_${i}`)?.value);
+    if (!isNaN(wc)&&!isNaN(dd)&&wc>0&&dd>0) { wcArr.push(wc); ddArr.push(dd); }
+  }
+  const warningElStd = document.getElementById('s_rpt_dataWarning');
+  if (wcArr.length < 3) {
+    if (warningElStd) {
+      warningElStd.textContent = `⚠ Only ${wcArr.length} valid data point(s). Minimum 3 required for curve fitting.`;
+      warningElStd.style.display = 'block';
+    }
+  } else {
+    if (warningElStd) warningElStd.style.display = 'none';
+  }
+  let fit = wcArr.length>=3 ? fitParabola(wcArr,ddArr) : null;
+  if (fit&&fit.xPeak>0&&fit.yPeak>0) {
+    setTextS('s_rpt_mdd', fit.yPeak.toFixed(3));
+    setTextS('s_rpt_omc', fit.xPeak.toFixed(1));
+    setTextS('s_rpt_fitNote','');
+    std_mdd = fit.yPeak; std_omc = fit.xPeak;
+  } else if (ddArr.length >= 1) {
+    const maxIdx = ddArr.indexOf(Math.max(...ddArr));
+    setTextS('s_rpt_mdd', ddArr[maxIdx].toFixed(3) + ' *');
+    setTextS('s_rpt_omc', wcArr[maxIdx].toFixed(1) + ' *');
+    setTextS('s_rpt_fitNote','* Insufficient points for curve fit — peak point used');
+    std_mdd = ddArr[maxIdx]; std_omc = wcArr[maxIdx];
+  } else {
+    setTextS('s_rpt_mdd','—'); setTextS('s_rpt_omc','—');
+    setTextS('s_rpt_fitNote','Enter at least 3 test points to calculate MDD/OMC');
+    std_mdd = null; std_omc = null;
+  }
+  const corrLabelStd = document.getElementById('s_enableOversize')?.checked &&
+                       document.getElementById('s_useCorrDensity')?.checked
+                       ? '(Corrected per ASTM D4718)' : '(Uncorrected)';
+  setTextS('s_rpt_densityNote', corrLabelStd);
+  const Gs = parseFloat(document.getElementById('s_gsValue').value)||2.68;
+  if (wcArr.length>0) {
+    const oversizeOn = document.getElementById('s_enableOversize').checked;
+    const useCorrOn  = document.getElementById('s_useCorrDensity').checked;
+    if (oversizeOn && useCorrOn) {
+      const wcRaw=[], ddRaw=[], ddCorr=[];
+      for (let i=0; i<s_numRows; i++) {
+        const wc = parseFloat(document.getElementById(`sm_wc_${i}`)?.value);
+        const dd = parseFloat(document.getElementById(`sm_dryDens_${i}`)?.value);
+        const dc = parseFloat(document.getElementById(`sm_corrDens_${i}`)?.value);
+        if (!isNaN(wc)&&!isNaN(dd)&&wc>0&&dd>0) { wcRaw.push(wc); ddRaw.push(dd); ddCorr.push(isNaN(dc)?dd:dc); }
+      }
+      const rawFit  = wcRaw.length>=3 ? fitParabola(wcRaw,ddRaw) : null;
+      const corrFit = wcRaw.length>=3 ? fitParabola(wcRaw,ddCorr) : null;
+      s_compactionChart = updateChart(wcRaw, ddRaw, rawFit, Gs, 's_compactionChart', s_compactionChart, '#7c3aed', '#dc2626', ddCorr, corrFit);
+    } else {
+      s_compactionChart = updateChart(wcArr, ddArr, fit, Gs, 's_compactionChart', s_compactionChart, '#7c3aed', '#dc2626');
+    }
+  }
+
+  // Comparison box
+  updateComparison();
+}
+
+function buildReportWeightsTableStd() {
+  const tbody = document.getElementById('s_rpt_weightsBody');
+  tbody.innerHTML = '';
+  for (let i=0; i<s_numRows; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${document.getElementById(`sw_moldNo_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sw_moldSoil_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sw_moldWt_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sw_wetSoil_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sw_moldVol_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sw_wetDens_${i}`)?.value||'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function buildReportMoistureTableStd() {
+  const tbody = document.getElementById('s_rpt_moistureBody');
+  tbody.innerHTML = '';
+  for (let i=0; i<s_numRows; i++) {
+    const useCorr = document.getElementById('s_enableOversize').checked && document.getElementById('s_useCorrDensity').checked;
+    const corrDens = document.getElementById(`sm_corrDens_${i}`)?.value;
+    const dryDens  = document.getElementById(`sm_dryDens_${i}`)?.value;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${document.getElementById(`sm_contNo_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sm_wetDryTare_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sm_dryTare_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sm_tare_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sm_waterMass_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sm_drySoilMass_${i}`)?.value||'—'}</td>
+      <td>${document.getElementById(`sm_wc_${i}`)?.value||'—'}</td>
+      <td>${dryDens||'—'}</td>
+      <td>${useCorr?(corrDens||dryDens||'—'):dryDens||'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ============================================================
+// COMPARISON TABLE
+// ============================================================
+function updateComparison() {
+  const box = document.getElementById('s_comparisonBox');
+  if (!box) return;
+  if (std_mdd !== null && mod_mdd !== null) {
+    box.style.display = 'block';
+    setTextS('cmp_std_mdd', std_mdd.toFixed(3));
+    setTextS('cmp_mod_mdd', mod_mdd.toFixed(3));
+    const diffMdd = mod_mdd - std_mdd;
+    const el1 = document.getElementById('cmp_diff_mdd');
+    if(el1) { el1.textContent = (diffMdd>=0?'+':'')+diffMdd.toFixed(3)+' g/cm³'; el1.className = diffMdd>0?'diff-better':'diff-worse'; }
+
+    setTextS('cmp_std_omc', std_omc.toFixed(1)+'%');
+    setTextS('cmp_mod_omc', mod_omc.toFixed(1)+'%');
+    const diffOmc = std_omc - mod_omc;
+    const el2 = document.getElementById('cmp_diff_omc');
+    if(el2) { el2.textContent = (diffOmc>=0?'+':'')+diffOmc.toFixed(1)+'%'; el2.className = diffOmc>0?'diff-better':'diff-worse'; }
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+// ============================================================
+// DEMO DATA
+// ============================================================
+function checkIfAnyDataEntered() {
+  const inputs = document.querySelectorAll(
+    '#dataEntryTab input:not([readonly]), #dataEntryTabStd input:not([readonly])'
+  );
+  for (const inp of inputs) {
+    if (inp.value && inp.value !== inp.defaultValue && inp.value !== '944.0'
+        && inp.value !== '2.680' && inp.value !== '4.536'
+        && inp.value !== '2.495' && inp.value !== '305'
+        && inp.value !== '457'  && inp.value !== '25'
+        && inp.type !== 'date') return true;
+  }
+  return false;
+}
+
+function fillDemoData() {
+  const hasData = checkIfAnyDataEntered();
+  if (hasData) {
+    if (!confirm('This will overwrite all current data. Continue?')) return;
+  }
+  if (currentTestType === 'modified') {
+    fillDemoDataModified();
+  } else {
+    fillDemoDataStandard();
+  }
+}
+
+function fillDemoDataModified() {
+  document.getElementById('projectName').value = 'Al-Noor Highway Extension Project';
+  document.getElementById('reportNo').value = 'RPT-GEO-2024-047-MOD';
+  document.getElementById('client').value = 'Ministry of Transport — Roads Division';
+  document.getElementById('reportDate').value = '2024-06-15';
+  document.getElementById('sampleId').value = 'S-BH3-1.5';
+  document.getElementById('testDate').value = '2024-06-10';
+  document.getElementById('location').value = 'BH-03 / Sta. 12+500';
+  document.getElementById('depth').value = '1.5';
+  document.getElementById('asReceivedWC').value = '9.8';
+  document.getElementById('sampleMass').value = '28.0';
+  document.getElementById('method').value = 'Method A (4-in mold, No.4 sieve)';
+  document.getElementById('procedure').value = 'Moist Method';
+  document.getElementById('rammerMass').value = '4.536';
+  document.getElementById('dropHeight').value = '457';
+  document.getElementById('numLayers').value = '5';
+  document.getElementById('blowsLayer').value = '25';
+  document.getElementById('moldVolume').value = '944.0';
+  document.getElementById('moldId').value = 'MLD-101';
+  document.getElementById('sieveUsed').value = 'No.4';
+  document.getElementById('fractionUsed').value = 'Passing No.4 sieve';
+  document.getElementById('sampleDesc').value = 'Silty Sandy Gravel with some clay, brownish gray, medium plasticity';
+  document.getElementById('uscs').value = 'GM';
+  document.getElementById('aashto').value = 'A-2-4';
+  document.getElementById('gsValue').value = '2.68';
+  document.getElementById('oversizeCorr').value = 'Not Applied';
+  document.getElementById('slakingTime').value = 'N/A';
+  document.getElementById('remarks').value = 'Sample tested per ASTM D1557-12(2021) Method A.';
+  document.getElementById('balanceId').value = 'BAL-05';
+  document.getElementById('moldId2').value = 'MLD-101';
+  document.getElementById('rammerId').value = 'RAM-03';
+  document.getElementById('ovenId').value = 'OVN-02';
+  document.getElementById('calibDue').value = '2024-12-31';
+  document.getElementById('envTemp').value = '24.5';
+  document.getElementById('envHumidity').value = '52.0';
+  document.getElementById('techName').value = 'Eng. Ahmed Al-Rashidi';
+  document.getElementById('reviewedBy').value = 'Dr. Khalid Al-Mansouri';
+  document.getElementById('approvedBy').value = 'Prof. Yousuf Al-Amin';
+
+  const weightData = [
+    ['M-101', 3.812, 2.104, 944.0],
+    ['M-101', 3.946, 2.104, 944.0],
+    ['M-101', 4.072, 2.104, 944.0],
+    ['M-101', 4.030, 2.104, 944.0],
+    ['M-101', 3.975, 2.104, 944.0],
+  ];
+  const moistData = [
+    ['C-01', 185.42, 178.32, 42.15],
+    ['C-02', 198.76, 189.44, 42.30],
+    ['C-03', 215.88, 203.62, 42.18],
+    ['C-04', 224.15, 210.08, 42.25],
+    ['C-05', 219.33, 204.20, 42.10],
+  ];
+  numRows = 5;
+  buildTables();
+  for (let i=0; i<5; i++) {
+    document.getElementById(`w_moldNo_${i}`).value = weightData[i][0];
+    document.getElementById(`w_moldSoil_${i}`).value = weightData[i][1];
+    document.getElementById(`w_moldWt_${i}`).value = weightData[i][2];
+    document.getElementById(`w_moldVol_${i}`).value = weightData[i][3];
+    document.getElementById(`m_contNo_${i}`).value = moistData[i][0];
+    document.getElementById(`m_wetDryTare_${i}`).value = moistData[i][1];
+    document.getElementById(`m_dryTare_${i}`).value = moistData[i][2];
+    document.getElementById(`m_tare_${i}`).value = moistData[i][3];
+    calcWeightRow(i);
+  }
+}
+
+function fillDemoDataStandard() {
+  // Standard Proctor demo — same soil, lower MDD expected, higher OMC
+  document.getElementById('s_projectName').value = 'Al-Noor Highway Extension Project';
+  document.getElementById('s_reportNo').value = 'RPT-GEO-2024-047-STD';
+  document.getElementById('s_client').value = 'Ministry of Transport — Roads Division';
+  document.getElementById('s_reportDate').value = '2024-06-15';
+  document.getElementById('s_sampleId').value = 'S-BH3-1.5-STD';
+  document.getElementById('s_testDate').value = '2024-06-10';
+  document.getElementById('s_location').value = 'BH-03 / Sta. 12+500';
+  document.getElementById('s_depth').value = '1.5';
+  document.getElementById('s_asReceivedWC').value = '9.8';
+  document.getElementById('s_sampleMass').value = '28.0';
+  document.getElementById('s_method').value = 'Method A (4-in mold, No.4 sieve) — D698';
+  document.getElementById('s_procedure').value = 'Moist Method';
+  document.getElementById('s_rammerMass').value = '2.495';
+  document.getElementById('s_dropHeight').value = '305';
+  document.getElementById('s_numLayers').value = '3';
+  document.getElementById('s_blowsLayer').value = '25';
+  document.getElementById('s_moldVolume').value = '944.0';
+  document.getElementById('s_moldId').value = 'MLD-102';
+  document.getElementById('s_sieveUsed').value = 'No.4';
+  document.getElementById('s_fractionUsed').value = 'Passing No.4 sieve';
+  document.getElementById('s_sampleDesc').value = 'Silty Sandy Gravel with some clay, brownish gray, medium plasticity';
+  document.getElementById('s_uscs').value = 'GM';
+  document.getElementById('s_aashto').value = 'A-2-4';
+  document.getElementById('s_gsValue').value = '2.68';
+  document.getElementById('s_slakingTime').value = 'N/A';
+  document.getElementById('s_remarks').value = 'Sample tested per ASTM D698-12(2021) Method A. Standard Proctor energy ~600 kN·m/m³.';
+  document.getElementById('s_balanceId').value = 'BAL-05';
+  document.getElementById('s_moldId2').value = 'MLD-102';
+  document.getElementById('s_rammerId').value = 'RAM-STD-01';
+  document.getElementById('s_ovenId').value = 'OVN-02';
+  document.getElementById('s_calibDue').value = '2024-12-31';
+  document.getElementById('s_envTemp').value = '24.5';
+  document.getElementById('s_envHumidity').value = '52.0';
+  document.getElementById('s_techName').value = 'Eng. Ahmed Al-Rashidi';
+  document.getElementById('s_reviewedBy').value = 'Dr. Khalid Al-Mansouri';
+  document.getElementById('s_approvedBy').value = 'Prof. Yousuf Al-Amin';
+
+  // Standard Proctor demo data — same soil yields ~1.72 g/cm³ MDD at ~16% OMC
+  const weightData = [
+    ['M-102', 3.612, 2.104, 944.0],
+    ['M-102', 3.724, 2.104, 944.0],
+    ['M-102', 3.815, 2.104, 944.0],
+    ['M-102', 3.780, 2.104, 944.0],
+    ['M-102', 3.720, 2.104, 944.0],
+  ];
+  const moistData = [
+    ['C-11', 178.22, 172.50, 42.15],
+    ['C-12', 196.40, 187.25, 42.30],
+    ['C-13', 218.60, 206.80, 42.18],
+    ['C-14', 228.35, 214.10, 42.25],
+    ['C-15', 222.70, 207.10, 42.10],
+  ];
+  s_numRows = 5;
+  buildTablesStd();
+  for (let i=0; i<5; i++) {
+    document.getElementById(`sw_moldNo_${i}`).value = weightData[i][0];
+    document.getElementById(`sw_moldSoil_${i}`).value = weightData[i][1];
+    document.getElementById(`sw_moldWt_${i}`).value = weightData[i][2];
+    document.getElementById(`sw_moldVol_${i}`).value = weightData[i][3];
+    document.getElementById(`sm_contNo_${i}`).value = moistData[i][0];
+    document.getElementById(`sm_wetDryTare_${i}`).value = moistData[i][1];
+    document.getElementById(`sm_dryTare_${i}`).value = moistData[i][2];
+    document.getElementById(`sm_tare_${i}`).value = moistData[i][3];
+    calcWeightRowStd(i);
+  }
+  updateEnergyDisplay();
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function resetAll() {
+  const msg = currentLang==='ar'
+    ? 'هل أنت متأكد من حذف جميع البيانات؟'
+    : 'Are you sure you want to reset all data for the current test?';
+  if (!confirm(msg)) return;
+  if (currentTestType === 'modified') {
+    document.querySelectorAll('#dataEntryTab input[type=text], #dataEntryTab input[type=number], #dataEntryTab input[type=date]').forEach(el => {
+      if (!el.readOnly) el.value = '';
+    });
+    document.querySelectorAll('#dataEntryTab textarea').forEach(el => { el.value = ''; });
+    document.getElementById('method').value = 'Method A (4-in mold, No.4 sieve)';
+    document.getElementById('procedure').value = 'Moist Method';
+    document.getElementById('corrMethod').value = 'ASTM D4718';
+    document.getElementById('enableOversize').checked = false;
+    document.getElementById('useCorrDensity').checked = true;
+    document.getElementById('oversizeFields').classList.add('hidden');
+    document.getElementById('moldVolume').value = '944.0';
+    document.getElementById('gsValue').value = '2.680';
+    document.getElementById('rammerMass').value = '4.536';
+    document.getElementById('dropHeight').value = '457';
+    document.getElementById('numLayers').value = '5';
+    document.getElementById('blowsLayer').value = '25';
+    document.getElementById('gsOversize').value = '2.750';
+    numRows = 5;
+    buildTables();
+    if (compactionChart) { compactionChart.destroy(); compactionChart = null; }
+    mod_mdd = null; mod_omc = null;
+  } else {
+    document.querySelectorAll('#dataEntryTabStd input[type=text], #dataEntryTabStd input[type=number], #dataEntryTabStd input[type=date]').forEach(el => {
+      if (!el.readOnly) el.value = '';
+    });
+    document.querySelectorAll('#dataEntryTabStd textarea').forEach(el => { el.value = ''; });
+    document.getElementById('s_method').value = 'Method A (4-in mold, No.4 sieve) — D698';
+    document.getElementById('s_procedure').value = 'Moist Method';
+    document.getElementById('s_corrMethod').value = 'ASTM D4718';
+    document.getElementById('s_enableOversize').checked = false;
+    document.getElementById('s_useCorrDensity').checked = true;
+    document.getElementById('s_oversizeFields').classList.add('hidden');
+    document.getElementById('s_moldVolume').value = '944.0';
+    document.getElementById('s_gsValue').value = '2.680';
+    document.getElementById('s_rammerMass').value = '2.495';
+    document.getElementById('s_dropHeight').value = '305';
+    document.getElementById('s_numLayers').value = '3';
+    document.getElementById('s_blowsLayer').value = '25';
+    document.getElementById('s_gsOversize').value = '2.750';
+    s_numRows = 5;
+    buildTablesStd();
+    if (s_compactionChart) { s_compactionChart.destroy(); s_compactionChart = null; }
+    std_mdd = null; std_omc = null;
+  }
+}
+
+// ============================================================
+// PRINT
+// ============================================================
+function printReport() {
+  // Remove print-target from all first
+  document.querySelectorAll('.tab-content').forEach(el =>
+    el.classList.remove('print-target')
+  );
+
+  if (currentTestType === 'modified') {
+    updateReport();
+    document.getElementById('finalReportTab').classList.add('print-target');
+    if (!document.getElementById('finalReportTab').classList.contains('active')) {
+      switchMainTab('modified', 'finalReport');
+    }
+  } else {
+    updateReportStd();
+    document.getElementById('finalReportTabStd').classList.add('print-target');
+    if (!document.getElementById('finalReportTabStd').classList.contains('active')) {
+      switchMainTab('standard', 'finalReport');
+    }
+  }
+  setTimeout(() => {
+    window.print();
+    // Clean up after print dialog
+    setTimeout(() => {
+      document.querySelectorAll('.tab-content').forEach(el =>
+        el.classList.remove('print-target')
+      );
+    }, 1000);
+  }, 400);
+}
+
+// ============================================================
+// HELPER
+// ============================================================
+function setVal(id, val) { const el=document.getElementById(id); if(el) el.value=val; }
+
+// ============================================================
+// LIVE INPUT LISTENERS
+// ============================================================
+document.addEventListener('input', function(e) {
+  const id = e.target.id;
+  // Modified
+  if (id === 'moldVolume') {
+    for (let i=0; i<numRows; i++) {
+      const el = document.getElementById(`w_moldVol_${i}`);
+      if (el && !el.value) el.value = e.target.value;
+    }
+    recalcAll();
+  }
+  if (id === 'gsValue' || id === 'pctOversize' || id === 'gsOversize') recalcAll();
+  if (id === 'moldId') {
+    const el2 = document.getElementById('moldId2');
+    if (el2 && !el2.value) el2.value = e.target.value;
+  }
+  // Standard
+  if (id === 's_moldVolume') {
+    for (let i=0; i<s_numRows; i++) {
+      const el = document.getElementById(`sw_moldVol_${i}`);
+      if (el && !el.value) el.value = e.target.value;
+    }
+    recalcAllStd();
+  }
+  if (id === 's_gsValue' || id === 's_pctOversize' || id === 's_gsOversize') recalcAllStd();
+  if (id === 's_moldId') {
+    const el2 = document.getElementById('s_moldId2');
+    if (el2 && !el2.value) el2.value = e.target.value;
+  }
+  // Update energy display on any Standard Proctor setup field change
+  if (['s_rammerMass','s_dropHeight','s_numLayers','s_blowsLayer','s_moldVolume'].includes(id)) {
+    updateEnergyDisplay();
+  }
+
+  // BUG 4: Live report sync for info fields
+  const modInfoFields = [
+    'projectName','reportNo','client','reportDate','sampleId','testDate',
+    'location','depth','asReceivedWC','sampleMass','method','procedure',
+    'rammerMass','dropHeight','numLayers','blowsLayer','moldVolume','moldId',
+    'sieveUsed','fractionUsed','sampleDesc','uscs','aashto','gsValue',
+    'overCorr','slakingTime','remarks','balanceId','moldId2','rammerId',
+    'ovenId','calibDue','envTemp','envHumidity','techName','reviewedBy','approvedBy'
+  ];
+  if (modInfoFields.includes(id)) {
+    if (currentView === 'finalReport' && currentTestType === 'modified') updateReport();
+  }
+  if (id.startsWith('s_')) {
+    if (currentView === 'finalReport' && currentTestType === 'standard') updateReportStd();
+  }
+});
+
+// ============================================================
+// SETTINGS PANEL
+// ============================================================
+function toggleSettingsPanel(e) {
+  e.stopPropagation();
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.toggle('open');
+}
+function closeSettings() {
+  document.getElementById('settingsPanel')?.classList.remove('open');
+}
+// Close on outside click
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('settingsWrapper')?.contains(e.target)) closeSettings();
+});
+
+// ============================================================
+// DARK MODE
+// ============================================================
+let darkMode = false;
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  document.body.classList.toggle('dark-mode', darkMode);
+  // Update panel badge
+  const badge = document.getElementById('siDarkBadge');
+  const icon  = document.getElementById('siDarkIcon');
+  const item  = document.getElementById('siDarkMode');
+  if (badge) badge.textContent = darkMode ? 'تشغيل' : 'إيقاف';
+  if (icon)  icon.textContent  = darkMode ? '☀️' : '🌙';
+  if (item)  item.classList.toggle('si-active', darkMode);
+  try { localStorage.setItem('proctor_dark', darkMode ? '1' : '0'); } catch(e) {}
+}
+
+// ============================================================
+// DATA LOCK
+// ============================================================
+let dataLocked = false;
+function toggleDataLock() {
+  dataLocked = !dataLocked;
+  document.body.classList.toggle('data-locked', dataLocked);
+  const badge = document.getElementById('siLockBadge');
+  const icon  = document.getElementById('siLockIcon');
+  const item  = document.getElementById('siLock');
+  const indicator = document.querySelector('.lock-indicator');
+  if (badge) badge.textContent = dataLocked ? 'مقفل 🔒' : 'غير مقفل';
+  if (icon)  icon.textContent  = dataLocked ? '🔒' : '🔓';
+  if (item)  item.classList.toggle('si-active', dataLocked);
+  if (indicator) indicator.style.display = dataLocked ? 'inline-block' : 'none';
+}
+
+// ============================================================
+// SAVE / LOAD DATA (JSON)
+// ============================================================
+function collectAllData() {
+  const data = { version: '1.0', timestamp: new Date().toISOString(), modified: {}, standard: {} };
+  // Collect all modified inputs
+  document.querySelectorAll('#dataEntryTab input, #dataEntryTab select, #dataEntryTab textarea').forEach(el => {
+    if (el.id) {
+      if (el.type === 'checkbox') data.modified[el.id] = el.checked;
+      else data.modified[el.id] = el.value;
+    }
+  });
+  // Collect table data
+  saveAllData();
+  data.modified._savedData = JSON.parse(JSON.stringify(savedData));
+  data.modified._numRows = numRows;
+  // Collect all standard inputs
+  document.querySelectorAll('#dataEntryTabStd input, #dataEntryTabStd select, #dataEntryTabStd textarea').forEach(el => {
+    if (el.id) {
+      if (el.type === 'checkbox') data.standard[el.id] = el.checked;
+      else data.standard[el.id] = el.value;
+    }
+  });
+  saveAllDataStd();
+  data.standard._savedDataStd = JSON.parse(JSON.stringify(savedDataStd));
+  data.standard._numRows = s_numRows;
+  return data;
+}
+
+function saveDataToFile() {
+  const data = collectAllData();
+  const reportNo = document.getElementById('reportNo')?.value || 'proctor';
+  const filename = `proctor_${reportNo}_${new Date().toISOString().split('T')[0]}.json`;
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function loadDataFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.modified && !data.standard) { alert('ملف غير صالح'); return; }
+      const msg = currentLang === 'ar'
+        ? 'سيتم استبدال جميع البيانات الحالية. هل تريد المتابعة؟'
+        : 'This will replace all current data. Continue?';
+      if (!confirm(msg)) return;
+
+      // Restore modified
+      if (data.modified) {
+        if (data.modified._numRows) { numRows = data.modified._numRows; buildTables(); }
+        if (data.modified._savedData) {
+          Object.assign(savedData, data.modified._savedData);
+          restoreAllData();
+        }
+        Object.entries(data.modified).forEach(([id, val]) => {
+          if (id.startsWith('_')) return;
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (el.type === 'checkbox') el.checked = val;
+          else el.value = val;
+        });
+        // Trigger oversize visibility
+        const oversizeEl = document.getElementById('enableOversize');
+        if (oversizeEl) {
+          document.getElementById('oversizeFields')?.classList.toggle('hidden', !oversizeEl.checked);
+        }
+        recalcAll();
+      }
+      // Restore standard
+      if (data.standard) {
+        if (data.standard._numRows) { s_numRows = data.standard._numRows; buildTablesStd(); }
+        if (data.standard._savedDataStd) {
+          Object.assign(savedDataStd, data.standard._savedDataStd);
+          restoreAllDataStd();
+        }
+        Object.entries(data.standard).forEach(([id, val]) => {
+          if (id.startsWith('_')) return;
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (el.type === 'checkbox') el.checked = val;
+          else el.value = val;
+        });
+        const s_oversizeEl = document.getElementById('s_enableOversize');
+        if (s_oversizeEl) {
+          document.getElementById('s_oversizeFields')?.classList.toggle('hidden', !s_oversizeEl.checked);
+        }
+        recalcAllStd();
+        updateEnergyDisplay();
+      }
+      alert(currentLang === 'ar' ? '✅ تم تحميل البيانات بنجاح' : '✅ Data loaded successfully');
+    } catch(err) {
+      alert('خطأ في قراءة الملف: ' + err.message);
+    }
+    event.target.value = ''; // reset file input
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', function() {
+  const today = new Date().toISOString().split('T')[0];
+  // Set default dates
+  ['reportDate','testDate','s_reportDate','s_testDate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+  buildTables();
+  buildTablesStd();
+  applyTranslations();
+  updateEnergyDisplay();
+  // Restore dark mode preference
+  try {
+    if (localStorage.getItem('proctor_dark') === '1') toggleDarkMode();
+  } catch(e) {}
+  // Init lock indicator hidden
+  const li = document.querySelector('.lock-indicator');
+  if (li) li.style.display = 'none';
+});
+</script>
+</body>
+</html>
