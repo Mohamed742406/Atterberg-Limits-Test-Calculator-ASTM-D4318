@@ -1466,16 +1466,20 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
         <div class="field-group">
           <label class="field-label">
             <span data-i18n="lbl_temp">درجة الحرارة</span>
-            <span class="unit">(°C)</span>
+            <span class="unit">(°C) <span style="color:var(--text-light);font-size:9px;">[18–28°C ISO §5.3]</span></span>
           </label>
-          <input class="form-control" id="temperature" type="number" step="0.1" min="0" max="50" oninput="updateReport()">
+          <input class="form-control" id="temperature" type="number" step="0.1" min="0" max="50"
+            oninput="validateEnvField(this,18,28,'temp');updateReport()">
+          <div class="field-error-msg" id="tempMsg"></div>
         </div>
         <div class="field-group">
           <label class="field-label">
             <span data-i18n="lbl_humidity">الرطوبة النسبية</span>
-            <span class="unit">(%)</span>
+            <span class="unit">(%) <span style="color:var(--text-light);font-size:9px;">[25–75% ISO §5.3]</span></span>
           </label>
-          <input class="form-control" id="humidity" type="number" step="0.1" min="0" max="100" oninput="updateReport()">
+          <input class="form-control" id="humidity" type="number" step="0.1" min="0" max="100"
+            oninput="validateEnvField(this,25,75,'humidity');updateReport()">
+          <div class="field-error-msg" id="humidityMsg"></div>
         </div>
         <div class="field-group">
           <label class="field-label"><span data-i18n="lbl_testTime">وقت الاختبار</span></label>
@@ -1554,16 +1558,20 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
         <div class="field-group">
           <label class="field-label">
             <span data-i18n="lbl_cupWeight">وزن الكوب (Cup Weight)</span>
-            <span class="unit">(g) [185–215 g]</span>
+            <span class="unit">(g) [185–215 g] ASTM §6.1.3</span>
           </label>
-          <input class="form-control" id="cupWeight" type="number" step="0.1" min="185" max="215" oninput="updateReport()">
+          <input class="form-control" id="cupWeight" type="number" step="0.1" min="185" max="215"
+            oninput="validateRangeField(this,185,215,'cupWeightMsg','astm_cup');updateReport()">
+          <div class="field-error-msg" id="cupWeightMsg"></div>
         </div>
         <div class="field-group">
           <label class="field-label">
             <span data-i18n="lbl_dropHeight">ارتفاع السقوط (Height of Drop)</span>
-            <span class="unit">(mm) [10 ± 0.2 mm]</span>
+            <span class="unit">(mm) [10 ± 0.2 mm] ASTM §9.2</span>
           </label>
-          <input class="form-control" id="dropHeight" type="number" step="0.1" min="9.8" max="10.2" oninput="updateReport()">
+          <input class="form-control" id="dropHeight" type="number" step="0.1" min="9.8" max="10.2"
+            oninput="validateRangeField(this,9.8,10.2,'dropHeightMsg','astm_drop');updateReport()">
+          <div class="field-error-msg" id="dropHeightMsg"></div>
         </div>
       </div>
     </div>
@@ -2324,6 +2332,17 @@ function setLang(lang) {
   if (lockBtn) lockBtn.textContent = resultsLocked ? i18n[lang].btnUnlock : i18n[lang].btnLock;
 
   updateBlowRangeLabel();
+
+  // Re-run field validations so messages appear in new language
+  const cupEl  = document.getElementById('cupWeight');
+  const dropEl = document.getElementById('dropHeight');
+  const tempEl = document.getElementById('temperature');
+  const humEl  = document.getElementById('humidity');
+  if (cupEl?.value)  validateRangeField(cupEl,  185, 215, 'cupWeightMsg',  'astm_cup');
+  if (dropEl?.value) validateRangeField(dropEl, 9.8, 10.2,'dropHeightMsg', 'astm_drop');
+  if (tempEl?.value) validateEnvField(tempEl, 18, 28, 'temp');
+  if (humEl?.value)  validateEnvField(humEl,  25, 75, 'humidity');
+  checkAllCalibrations();
   updateReport();
 }
 
@@ -3184,6 +3203,7 @@ function updateReport() {
   // Section 1
   setText('rpt_projName', document.getElementById('projName')?.value || '');
   setText('rpt_reportNum', document.getElementById('reportNum')?.value || '');
+  updateFormNo(); // Fix B: Form No. auto-generated from report number
   setText('rpt_client', document.getElementById('clientName')?.value || '');
   setText('rpt_reportDate', document.getElementById('reportDate')?.value || '');
   setText('rpt_sampleId', document.getElementById('sampleId')?.value || '');
@@ -3485,6 +3505,16 @@ function fillDemoData() {
     const statusMap = { balanceCal:'balanceCalStatus', llDeviceCal:'llDevCalStatus', grooveCal:'grooveCalStatus', ovenCal:'ovenCalStatus' };
     checkCalExpiry(id, statusMap[id]);
   });
+
+  // Re-check range fields
+  const cupEl  = document.getElementById('cupWeight');
+  const dropEl = document.getElementById('dropHeight');
+  const tempEl = document.getElementById('temperature');
+  const humEl  = document.getElementById('humidity');
+  if (cupEl?.value)  validateRangeField(cupEl,  185, 215, 'cupWeightMsg',  'astm_cup');
+  if (dropEl?.value) validateRangeField(dropEl, 9.8, 10.2,'dropHeightMsg', 'astm_drop');
+  if (tempEl?.value) validateEnvField(tempEl, 18, 28, 'temp');
+  if (humEl?.value)  validateEnvField(humEl,  25, 75, 'humidity');
 }
 
 function setValue(id, val) {
@@ -3685,6 +3715,17 @@ function autoRestore() {
 
   for (let i = 1; i <= llRowCount; i++) calcLLRow(i);
   calcPL();
+
+  // Re-validate fields after restore
+  const _cup  = document.getElementById('cupWeight');
+  const _drop = document.getElementById('dropHeight');
+  const _temp = document.getElementById('temperature');
+  const _hum  = document.getElementById('humidity');
+  if (_cup?.value)  validateRangeField(_cup,  185, 215,  'cupWeightMsg',  'astm_cup');
+  if (_drop?.value) validateRangeField(_drop, 9.8, 10.2, 'dropHeightMsg', 'astm_drop');
+  if (_temp?.value) validateEnvField(_temp, 18, 28, 'temp');
+  if (_hum?.value)  validateEnvField(_hum,  25, 75, 'humidity');
+
   return true;
 }
 
@@ -3910,6 +3951,98 @@ function exportCSV() {
   link.download = `${proj}_D4318.csv`;
   link.click();
   addAuditEntry('CSV EXPORT', `Exported by user at ${new Date().toLocaleString('en-GB')}`);
+}
+
+/* ==============================================================
+   FIELD VALIDATION — Cup weight, Drop height, Temp, Humidity
+   ============================================================== */
+function validateRangeField(input, min, max, msgId, type) {
+  const val = parseFloat(input.value);
+  const msgEl = document.getElementById(msgId);
+  if (!msgEl) return;
+
+  if (input.value === '' || isNaN(val)) {
+    input.classList.remove('input-error', 'input-warn');
+    msgEl.textContent = '';
+    msgEl.classList.remove('visible');
+    return;
+  }
+
+  const msgs = {
+    astm_cup:  { ar: `⛔ خارج النطاق المسموح [185–215 g] — ASTM D4318 §6.1.3`, en: `⛔ Out of range [185–215 g] — ASTM D4318 §6.1.3` },
+    astm_drop: { ar: `⛔ خارج النطاق المسموح [10 ± 0.2 mm] — ASTM D4318 §9.2`, en: `⛔ Out of range [10 ± 0.2 mm] — ASTM D4318 §9.2` },
+  };
+
+  if (val < min || val > max) {
+    input.classList.add('input-error');
+    input.classList.remove('input-warn');
+    msgEl.textContent = msgs[type]?.[currentLang] || `⛔ القيمة خارج النطاق [${min}–${max}]`;
+    msgEl.style.color = 'var(--danger)';
+    msgEl.classList.add('visible');
+  } else {
+    input.classList.remove('input-error', 'input-warn');
+    msgEl.textContent = '';
+    msgEl.classList.remove('visible');
+  }
+}
+
+function validateEnvField(input, min, max, type) {
+  const val = parseFloat(input.value);
+  const msgId = type === 'temp' ? 'tempMsg' : 'humidityMsg';
+  const msgEl = document.getElementById(msgId);
+  if (!msgEl) return;
+
+  if (input.value === '' || isNaN(val)) {
+    input.classList.remove('input-error', 'input-warn');
+    msgEl.textContent = '';
+    msgEl.classList.remove('visible');
+    return;
+  }
+
+  const msgs = {
+    temp: {
+      ar: `⚠ خارج النطاق المثالي [18–28°C] — ISO 17025 §5.3 (الاختبار صالح لكن يُسجَّل)`,
+      en: `⚠ Outside ideal range [18–28°C] — ISO 17025 §5.3 (test valid but record)`
+    },
+    humidity: {
+      ar: `⚠ خارج النطاق المثالي [25–75%RH] — ISO 17025 §5.3 (يُسجَّل في التقرير)`,
+      en: `⚠ Outside ideal range [25–75%RH] — ISO 17025 §5.3 (record in report)`
+    }
+  };
+
+  if (val < min || val > max) {
+    input.classList.add('input-warn');
+    input.classList.remove('input-error');
+    msgEl.textContent = msgs[type]?.[currentLang] || `⚠ خارج النطاق`;
+    msgEl.style.color = 'var(--warning)';
+    msgEl.classList.add('visible');
+  } else {
+    input.classList.remove('input-error', 'input-warn');
+    msgEl.textContent = '';
+    msgEl.classList.remove('visible');
+  }
+}
+
+/* ==============================================================
+   FORM NO. — Auto-generate from Report Number (Fix B)
+   Format: ATT-{reportNum} | fallback: ATT-01
+   ============================================================== */
+function updateFormNo() {
+  const reportNum = document.getElementById('reportNum')?.value?.trim();
+  const formNoEl  = document.getElementById('rpt_formNo');
+  if (!formNoEl) return;
+
+  if (reportNum) {
+    // Extract numeric/alphanumeric suffix from report number
+    // e.g. "ATT-2025-0042" → formNo = "ATT-0042"
+    //       "LAB-123"       → formNo = "ATT-123"
+    //       "2025-007"      → formNo = "ATT-007"
+    const numMatch = reportNum.match(/(\d{3,})$/);
+    const suffix   = numMatch ? numMatch[1].padStart(4,'0') : reportNum.replace(/[^A-Z0-9]/gi,'').slice(-6);
+    formNoEl.textContent = `ATT-${suffix}`;
+  } else {
+    formNoEl.textContent = 'ATT-01';
+  }
 }
 
 /* ==============================================================
