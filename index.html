@@ -1809,7 +1809,7 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
       <span data-i18n="sec_summary">ملخص النتائج النهائية — Final Results Summary</span>
     </div>
     <div class="section-body">
-      <div class="results-summary" id="resultsSummary">
+      <div class="results-summary" id="resultsSummary" style="grid-template-columns:repeat(5,1fr);">
         <div class="result-card">
           <div class="result-label">Liquid Limit (LL)</div>
           <div class="result-value" id="rsLL">—</div>
@@ -1824,6 +1824,11 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
           <div class="result-label">Plasticity Index (PI)</div>
           <div class="result-value" id="rsPI">—</div>
           <div class="result-unit">%</div>
+        </div>
+        <div class="result-card" id="rsLICard" style="background:var(--secondary);">
+          <div class="result-label">Liquidity Index (LI)</div>
+          <div class="result-value" id="rsLI">—</div>
+          <div class="result-unit" id="rsLINote" style="font-size:10px;">§3.1.8</div>
         </div>
         <div class="result-card classification" id="rsClassCard">
           <div class="result-label">USCS Classification</div>
@@ -2036,6 +2041,11 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
           <div class="r-lbl">Plasticity Index (PI)</div>
           <div class="r-val" id="rpt_PI">—</div>
           <div class="r-unit">%</div>
+        </div>
+        <div class="rpt-result-cell">
+          <div class="r-lbl">Liquidity Index (LI)</div>
+          <div class="r-val" style="font-size:13px;" id="rpt_LI">—</div>
+          <div class="r-unit">§3.1.8</div>
         </div>
         <div class="rpt-result-cell">
           <div class="r-lbl">USCS Classification</div>
@@ -2368,8 +2378,8 @@ function switchTab(n) {
   document.getElementById('progressFill').style.width = (n * 20) + '%';
 
   // Render charts when switching to relevant tabs
-  if (n === 3) { setTimeout(() => renderFlowChart3(), 100); }
-  if (n === 4) { setTimeout(() => renderPlasticityChart4(), 100); }
+  if (n === 3) { setTimeout(() => renderFlowChart3(), 150); }
+  if (n === 4) { setTimeout(() => renderPlasticityChart4(), 150); }
   if (n === 5) { updateReport(); }
 }
 
@@ -2388,6 +2398,8 @@ function setLLMethod(method) {
 
   buildKFactorTable();
   calcLL();
+  // Re-render chart with new method's min-point rule
+  if (currentTab === 3) setTimeout(() => renderFlowChart3(), 100);
 }
 
 function updateBlowRangeLabel() {
@@ -2501,9 +2513,13 @@ function calcLLRow(i) {
   const ds = dry - tare;
   const wc = (ds > 0) ? (mw / ds * 100) : 0;
 
-  document.getElementById(`llMW${i}`).textContent = (wet > 0 || dry > 0) ? mw.toFixed(2) : '—';
-  document.getElementById(`llDS${i}`).textContent = (dry > 0 || tare > 0) ? ds.toFixed(2) : '—';
-  document.getElementById(`llWC${i}`).textContent = (ds > 0) ? wc.toFixed(1) : '—';
+  const mwEl = document.getElementById(`llMW${i}`);
+  const dsEl = document.getElementById(`llDS${i}`);
+  const wcEl = document.getElementById(`llWC${i}`);
+
+  if (mwEl) mwEl.textContent = (wet > 0 || dry > 0) ? mw.toFixed(2) : '—';
+  if (dsEl) dsEl.textContent = (dry > 0 || tare > 0) ? ds.toFixed(2) : '—';
+  if (wcEl) wcEl.textContent = (ds > 0) ? wc.toFixed(1) : '—';
 
   calcLL();
 }
@@ -2536,30 +2552,40 @@ function calcLL() {
   let methodNote = '';
 
   if (llMethod === 'B' && points.length >= 1) {
-    // §15: One-Point Method — requires TWO trials, average them
-    // §14.1: N must be 20–30 blows for each trial
-    const validPts = points.filter(p => p.N >= 20 && p.N <= 30);
-    if (validPts.length >= 1) {
-      // Calculate LL for each valid trial: LL = wN × (N/25)^0.121
-      const trialLLs = validPts.map(p => p.wc * Math.pow(p.N / 25, 0.121));
-      if (trialLLs.length >= 2) {
-        // §15.1: LL = average of two trial values
-        const diff = Math.abs(trialLLs[0] - trialLLs[1]);
-        if (diff > 1.0) {
-          // §15.2: Difference > 1% → must repeat
-          methodNote = `⚠ Difference between trials = ${diff.toFixed(2)}% > 1% — Repeat test (§15.2)`;
+    // §13: One-Point Method — use FIRST TWO valid trials (N must be 20-30 each)
+    // §13.1: N must be 20-30 for each closure
+    // §13.4: second closure must have same N or ≤2 drops difference
+    const validPts = points.filter(p => p.N >= 20 && p.N <= 30).slice(0, 2);
+
+    if (validPts.length === 0) {
+      methodNote = `⚠ N خارج النطاق 20–30. أعد ضبط المحتوى المائي — ASTM §13.1`;
+    } else if (validPts.length === 1) {
+      // Single trial: show provisional
+      const ll1 = validPts[0].wc * Math.pow(validPts[0].N / 25, 0.121);
+      llVal = ll1; // provisional
+      methodNote = `⚠ تجربة واحدة فقط. الطريقة ب تحتاج تجربتين (§14.1.1). نتيجة مبدئية: w=${validPts[0].wc.toFixed(1)}%, N=${validPts[0].N} → LL≈${Math.round(ll1)}`;
+    } else {
+      // Two valid trials — §13.4: check N difference ≤ 2 blows
+      const nDiff = Math.abs(validPts[0].N - validPts[1].N);
+      if (nDiff > 2) {
+        // §13.4: N difference > 2 → remix and repeat
+        methodNote = `⚠ فرق N بين التجربتين = ${nDiff} > 2 ضربة — أعد الخلط وكرر الاختبار (§13.4)`;
+        llVal = null;
+      } else {
+        // §14.1: LL = w × (N/25)^0.121 for each trial
+        const ll1 = validPts[0].wc * Math.pow(validPts[0].N / 25, 0.121);
+        const ll2 = validPts[1].wc * Math.pow(validPts[1].N / 25, 0.121);
+        // §14.2: if |LL₁ - LL₂| > 1 percentage point → repeat
+        const llDiff = Math.abs(ll1 - ll2);
+        if (llDiff > 1.0) {
+          methodNote = `⚠ فرق LL بين التجربتين = ${llDiff.toFixed(2)}% > 1% — أعد الاختبار (§14.2)`;
           llVal = null;
         } else {
-          llVal = (trialLLs[0] + trialLLs[1]) / 2;
-          methodNote = `One-Point avg: LL₁=${Math.round(trialLLs[0])}, LL₂=${Math.round(trialLLs[1])}, avg=${Math.round(llVal)} (§15.1)`;
+          // §14.1.1: LL = average, nearest whole number
+          llVal = (ll1 + ll2) / 2;
+          methodNote = `ب (نقطة واحدة): T1→LL=${Math.round(ll1)}, T2→LL=${Math.round(ll2)}, متوسط=${Math.round(llVal)} | N-diff=${nDiff} (§14.1.1)`;
         }
-      } else {
-        // Only 1 trial — show provisional result with warning
-        llVal = trialLLs[0];
-        methodNote = `⚠ One-Point needs 2 trials (§15.1). Trial 1: w=${validPts[0].wc.toFixed(1)}%, N=${validPts[0].N} → LL≈${Math.round(llVal)}`;
       }
-    } else {
-      methodNote = '⚠ N must be between 20–30 for One-Point Method (§14.1)';
     }
   } else if (points.length >= 3) {
     // §11.7: Method A — multipoint, requires ≥3 trials
@@ -2569,11 +2595,10 @@ function calcLL() {
     const hasMid  = points.some(p => p.N >= 20 && p.N <= 30);
     const hasHigh = points.some(p => p.N >= 25 && p.N <= 35);
     const rangeOK = hasLow && hasMid && hasHigh;
-    methodNote = `Multipoint regression (${points.length} pts), N=25${rangeOK ? '' : ' — ⚠ Cover 15–25, 20–30, 25–35 blow ranges (§11.7)'}`;
+    methodNote = `أ (متعدد النقاط): ${points.length} نقاط، N=25${rangeOK ? '' : ' — ⚠ يجب تغطية 15-25 و20-30 و25-35 ضربة (§11.7)'}`;
   } else if (points.length === 2) {
-    // Minimum 3 points required for Method A per §11.7
     llVal = logRegressionAt25(points);
-    methodNote = `⚠ Method A requires ≥3 trials (§11.7). Result is provisional.`;
+    methodNote = `⚠ الطريقة أ تحتاج ≥3 تجارب (§11.7). نتيجة مبدئية.`;
   }
 
   // §20.4: Report LL as nearest whole number
@@ -2603,7 +2628,11 @@ function calcLL() {
     }
   }
 
-  if (currentTab === 3) renderFlowChart3();
+  if (currentTab === 3) {
+    // Debounce chart render to avoid partial-data renders during batch input (e.g. fillDemoData)
+    clearTimeout(window._flowChartTimer);
+    window._flowChartTimer = setTimeout(() => renderFlowChart3(), 80);
+  }
 
   // Guard against mutual recursion with updateReport
   if (!_updating) {
@@ -2703,14 +2732,16 @@ function calcPL() {
    SUMMARY CARDS (Tab 4)
    ============================================================== */
 function updateSummaryCards(llVal, plVal) {
-  if (resultsLocked) return; // Don't update when locked
+  if (resultsLocked) return;
   const rsLL = document.getElementById('rsLL');
   const rsPL = document.getElementById('rsPL');
   const rsPI = document.getElementById('rsPI');
+  const rsLI = document.getElementById('rsLI');
+  const rsLINote = document.getElementById('rsLINote');
   const rsClass = document.getElementById('rsClass');
   const rsClassNote = document.getElementById('rsClassNote');
 
-  // §20.4: Report LL, PL, PI as nearest whole numbers
+  // §20.4: Report as nearest whole numbers
   if (rsLL) rsLL.textContent = llVal !== null ? Math.round(llVal).toString() : '—';
   if (rsPL) rsPL.textContent = plVal !== null ? Math.round(plVal).toString() : '—';
 
@@ -2719,17 +2750,28 @@ function updateSummaryCards(llVal, plVal) {
       if (rsPI) rsPI.textContent = 'NP';
       if (rsClass) rsClass.textContent = 'NP';
       if (rsClassNote) rsClassNote.textContent = 'Nonplastic';
+      if (rsLI) rsLI.textContent = '—';
+      if (rsLINote) rsLINote.textContent = 'NP §3.1.8';
     } else {
       const pi = llVal - plVal;
       if (rsPI) rsPI.textContent = Math.round(pi).toString();
       const cls = getUSCS(llVal, pi);
       if (rsClass) rsClass.textContent = cls.symbol;
       if (rsClassNote) rsClassNote.textContent = cls.name;
+
+      // §3.1.8: Liquidity Index = (w - PL) / PI
+      // Note: w = natural water content — we don't have it, so show formula note
+      // LI is calculated on-demand if natural water content field exists
+      // For now show '—' with note to enter natural water content
+      if (rsLI) rsLI.textContent = '—';
+      if (rsLINote) rsLINote.textContent = 'LI = (w-PL)/PI §3.1.8';
     }
   } else {
     if (rsPI) rsPI.textContent = '—';
     if (rsClass) rsClass.textContent = '—';
     if (rsClassNote) rsClassNote.textContent = '';
+    if (rsLI) rsLI.textContent = '—';
+    if (rsLINote) rsLINote.textContent = '§3.1.8';
   }
 }
 
@@ -2760,30 +2802,54 @@ function getUSCS(LL, PI) {
 function renderFlowChart3() {
   const points = getLLData();
   const canvasId = 'flowChart3';
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
+  const warnId   = canvasId + '_warn';
+  const container = document.getElementById('flowChartContainer3');
+  if (!container) return;
 
+  // Destroy previous chart instance
   if (chartFlowTab3) { chartFlowTab3.destroy(); chartFlowTab3 = null; }
 
-  if (points.length < 2) {
-    // Show warning
-    const warn = document.createElement('div');
-    warn.className = 'chart-warning';
-    warn.textContent = t('alert_notEnoughData');
-    canvas.replaceWith(warn);
-    warn.id = canvasId + '_warn';
+  // Method B: can plot from 1 point; Method A: needs ≥2
+  const minPts = llMethod === 'B' ? 1 : 2;
+
+  if (points.length < minPts) {
+    // Show warning — replace canvas with div if needed
+    let warn = document.getElementById(warnId);
+    if (!warn) {
+      warn = document.createElement('div');
+      warn.id = warnId;
+      warn.className = 'chart-warning';
+      const existingCanvas = document.getElementById(canvasId);
+      if (existingCanvas) {
+        existingCanvas.replaceWith(warn);
+      } else {
+        container.appendChild(warn);
+      }
+    }
+    warn.textContent = llMethod === 'B'
+      ? (currentLang === 'ar' ? '⚠ أدخل بيانات التجربة (N، الأوزان) لعرض المنحنى.' : '⚠ Enter trial data (N, weights) to plot chart.')
+      : t('alert_notEnoughData');
     return;
   }
 
-  // Remove warning if exists
-  const warn = document.getElementById(canvasId + '_warn');
+  // Enough points — ensure we have a fresh canvas (remove warning if present)
+  let canvas = document.getElementById(canvasId);
+  const warn = document.getElementById(warnId);
   if (warn) {
+    // Replace warning with a new canvas
     const c = document.createElement('canvas');
     c.id = canvasId;
     warn.replaceWith(c);
+    canvas = c;
+  } else if (!canvas) {
+    // Neither canvas nor warning found — create canvas inside container
+    const c = document.createElement('canvas');
+    c.id = canvasId;
+    container.appendChild(c);
+    canvas = c;
   }
 
-  chartFlowTab3 = buildFlowChart(document.getElementById(canvasId) || canvas, points, true);
+  chartFlowTab3 = buildFlowChart(canvas, points, true);
 }
 
 /* ==============================================================
@@ -2802,38 +2868,67 @@ function renderFlowChartReport() {
    SHARED FLOW CHART BUILDER
    ============================================================== */
 function buildFlowChart(canvas, points, isLarge) {
-  const llVal = logRegressionAt25(points);
+  // For Method B with < 2 points, use formula line instead of regression
+  const isMethodB = llMethod === 'B';
+  const useRegression = points.length >= 2;
+
+  let llVal = useRegression ? logRegressionAt25(points) : null;
+  if (isMethodB && points.length >= 1) {
+    // Use Method B result directly
+    const validPts = points.filter(p => p.N >= 20 && p.N <= 30).slice(0, 2);
+    if (validPts.length >= 1) {
+      const ll1 = validPts[0].wc * Math.pow(validPts[0].N / 25, 0.121);
+      const ll2 = validPts.length >= 2 ? validPts[1].wc * Math.pow(validPts[1].N / 25, 0.121) : null;
+      if (ll2 !== null && Math.abs(ll1 - ll2) <= 1.0) {
+        llVal = (ll1 + ll2) / 2;
+      } else if (ll2 === null) {
+        llVal = ll1; // provisional
+      }
+    }
+  }
 
   // Build regression line + compute R²
   const regressionData = [];
   const logN = points.map(p => Math.log(p.N));
   const wc = points.map(p => p.wc);
   const n = points.length;
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-  logN.forEach((x, i) => {
-    sumX += x; sumY += wc[i];
-    sumXY += x * wc[i]; sumX2 += x * x;
-  });
-  const denom = n * sumX2 - sumX * sumX;
-  const b = Math.abs(denom) < 1e-10 ? 0 : (n * sumXY - sumX * sumY) / denom;
-  const a = (sumY - b * sumX) / n;
+  let a = 0, b = 0, r2 = 1;
+  let eqLabel = '';
 
-  // R² calculation
-  const yMean = sumY / n;
-  let ssTot = 0, ssRes = 0;
-  logN.forEach((x, i) => {
-    const yPred = a + b * x;
-    ssTot += (wc[i] - yMean) ** 2;
-    ssRes += (wc[i] - yPred) ** 2;
-  });
-  const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 1;
-  const eqLabel = n >= 2
-    ? `w = ${a.toFixed(2)} ${b >= 0 ? '+' : ''}${b.toFixed(2)}·ln(N)   R²=${r2.toFixed(4)}`
-    : '';
+  if (n >= 2) {
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    logN.forEach((x, i) => {
+      sumX += x; sumY += wc[i];
+      sumXY += x * wc[i]; sumX2 += x * x;
+    });
+    const denom = n * sumX2 - sumX * sumX;
+    b = Math.abs(denom) < 1e-10 ? 0 : (n * sumXY - sumX * sumY) / denom;
+    a = (sumY - b * sumX) / n;
 
-  // Regression line from N=10 to N=45
-  for (let N = 10; N <= 45; N += 1) {
-    regressionData.push({ x: N, y: a + b * Math.log(N) });
+    // R²
+    const yMean = sumY / n;
+    let ssTot = 0, ssRes = 0;
+    logN.forEach((x, i) => {
+      const yPred = a + b * x;
+      ssTot += (wc[i] - yMean) ** 2;
+      ssRes += (wc[i] - yPred) ** 2;
+    });
+    r2 = ssTot > 0 ? 1 - ssRes / ssTot : 1;
+    eqLabel = `w = ${a.toFixed(2)} ${b >= 0 ? '+' : ''}${b.toFixed(2)}·ln(N)   R²=${r2.toFixed(4)}`;
+
+    for (let N = 10; N <= 45; N += 1) {
+      regressionData.push({ x: N, y: a + b * Math.log(N) });
+    }
+  } else if (n === 1 && isMethodB) {
+    // For Method B single trial: draw formula curve through the point
+    const w0 = wc[0], N0 = points[0].N;
+    // LL = w0 × (N0/25)^0.121 → normalize to draw the formula line
+    const llFormula = w0 * Math.pow(N0 / 25, 0.121);
+    // The formula line: w(N) = llFormula × (25/N)^0.121
+    for (let N = 10; N <= 45; N += 1) {
+      regressionData.push({ x: N, y: llFormula * Math.pow(25 / N, 0.121) });
+    }
+    eqLabel = `LL = w × (N/25)^0.121  (§14.1)`;
   }
 
   // N=25 vertical annotation
@@ -3250,6 +3345,7 @@ function updateReport() {
       isNP = true;
       setText('rpt_PL', Math.round(plVal).toString());
       setText('rpt_PI', 'NP');
+      setText('rpt_LI', 'NP');
       setText('rpt_Class', 'NP');
       setText('rpt_ClassNote', 'Nonplastic');
     } else {
@@ -3257,12 +3353,15 @@ function updateReport() {
       cls = getUSCS(llVal, pi);
       setText('rpt_PL', Math.round(plVal).toString());
       setText('rpt_PI', Math.round(pi).toString());
+      // §3.1.8 LI = (w_natural - PL) / PI — natural WC not entered, show formula
+      setText('rpt_LI', '—');
       setText('rpt_Class', cls.symbol);
       setText('rpt_ClassNote', cls.name);
     }
   } else {
     setText('rpt_PL', plVal !== null ? Math.round(plVal).toString() : '—');
     setText('rpt_PI', '—');
+    setText('rpt_LI', '—');
     setText('rpt_Class', '—');
     setText('rpt_ClassNote', '');
   }
@@ -3500,6 +3599,12 @@ function fillDemoData() {
 
   calcPL();
   updateReport();
+  // Re-render flow chart after demo data regardless of active tab
+  // Use longer delay to ensure all setValue dispatched events have settled
+  setTimeout(() => {
+    renderFlowChart3();
+    renderPlasticityChart4();
+  }, 400);
   // Re-check calibrations after filling demo dates
   ['balanceCal','llDeviceCal','grooveCal','ovenCal'].forEach(id => {
     const statusMap = { balanceCal:'balanceCalStatus', llDeviceCal:'llDevCalStatus', grooveCal:'grooveCalStatus', ovenCal:'ovenCalStatus' };
@@ -3569,7 +3674,7 @@ function resetAll() {
   document.getElementById('llResultDisplay').textContent = '—';
 
   // Reset summary
-  ['rsLL','rsPL','rsPI','rsClass'].forEach(id => {
+  ['rsLL','rsPL','rsPI','rsLI','rsClass'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = '—';
   });
@@ -4327,6 +4432,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setLang(restored ? (JSON.parse(localStorage.getItem(LS_KEY))?._lang || 'ar') : 'ar');
   updateBlowRangeLabel();
   checkAllCalibrations(); // ISO 17025 calibration check on load
+
+  // Pre-render flow chart so it's ready when user navigates to tab 3
+  setTimeout(() => { renderFlowChart3(); }, 300);
 
   // Auto-save on any input change
   document.addEventListener('input',  () => autoSave());
