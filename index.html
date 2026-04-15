@@ -1055,7 +1055,7 @@ body.ltr .equip-table td {
   .app-header,
   .tabs-wrapper,
   .no-print,
-  #tab-1, #tab-2, #tab-3, #tab-4,
+  #tab-1, #tab-2, #tab-3, #tab-35, #tab-4,
   .tab-btn,
   .btn,
   .header-actions,
@@ -1144,6 +1144,15 @@ body.ltr .equip-table td {
     image-rendering: -webkit-optimize-contrast !important;
     image-rendering: crisp-edges !important;
   }
+
+  /* ── NP Banner in print ── */
+  #rpt_npBanner {
+    border: 2.5px solid #dc2626 !important;
+    background: #fff5f5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #rpt_npBannerText { color: #dc2626 !important; font-size: 13px !important; }
 
   /* ── PAGE BREAK RULES — prevent cutting elements ── */
   .rpt-header          { page-break-inside: avoid; break-inside: avoid; }
@@ -1252,6 +1261,17 @@ input[type="time"] {
   font-family: Arial, 'Helvetica Neue', sans-serif !important;
   font-weight: 700;
 }
+/* NP Tab button styling */
+.tab-btn.np-tab { color: rgba(252,165,165,0.9); }
+.tab-btn.np-tab.active { color: #fca5a5; border-bottom-color: #dc2626; }
+.tab-btn.np-tab:hover { color: #fca5a5; }
+
+/* NP checkbox active state */
+.np-chk-active {
+  border-color: var(--danger) !important;
+  background: #fff5f5 !important;
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f1f5f9; }
 ::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 3px; }
@@ -1371,6 +1391,10 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
     <button class="tab-btn" id="tabBtn3" onclick="switchTab(3)">
       <span class="tab-num">3</span>
       <span data-i18n="tab3">حد السيولة LL</span>
+    </button>
+    <button class="tab-btn np-tab" id="tabBtn35" onclick="switchTab(35)">
+      <span class="tab-num" style="background:rgba(220,38,38,0.25);color:#fca5a5;">NP</span>
+      <span data-i18n="tab35">إعلان غير لدن</span>
     </button>
     <button class="tab-btn" id="tabBtn4" onclick="switchTab(4)">
       <span class="tab-num">4</span>
@@ -1719,6 +1743,121 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
 </div>
 
 <!-- ============================================================
+     TAB 3.5 — NON-PLASTIC / NON-LIQUID DECLARATION
+     ============================================================ -->
+<div class="tab-panel" id="tab-35">
+  <div class="section-card">
+    <div class="section-header" style="background:var(--danger);">
+      <span class="section-icon">⚠</span>
+      <span>إعلان عدم السيولة / اللدونة — Non-Plastic / Non-Liquid Declaration</span>
+    </div>
+    <div class="section-body">
+
+      <!-- Info Banner -->
+      <div style="background:#fff5f5;border:1px solid #fca5a5;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+        <span style="font-size:28px;line-height:1;">⚠️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--danger);margin-bottom:4px;">متى تستخدم هذا التبويب؟</div>
+          <div style="font-size:12px;color:#7f1d1d;line-height:1.7;">
+            استخدم هذا الإعلان عندما لا تُظهر العينة خصائص السيولة أو اللدونة، أي لا يمكن تشكيلها في حالة بلاستيكية (مثل الرمال والحصى والتربة الخشنة). 
+            <br>وفق <strong>ASTM D4318 §3.1.8</strong>: التربة غير اللدنة (NP) هي التي يكون حد اللدونة أكبر من أو يساوي حد السيولة، أو لا يمكن تحديد أيٍّ منهما.
+          </div>
+        </div>
+      </div>
+
+      <!-- NP Type Checkboxes -->
+      <div style="margin-bottom:18px;">
+        <div class="field-label" style="margin-bottom:8px;font-size:13px;">نوع الإعلان — Declaration Type <span class="required-star">*</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--input-bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;transition:all 0.2s;" id="npTypeLabel1">
+            <input type="checkbox" id="npChk_noLL" onchange="updateNPDeclaration();autoSave()" style="width:16px;height:16px;cursor:pointer;">
+            <span>لا يوجد حد سيولة (No Liquid Limit)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--input-bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;transition:all 0.2s;" id="npTypeLabel2">
+            <input type="checkbox" id="npChk_noPL" onchange="updateNPDeclaration();autoSave()" style="width:16px;height:16px;cursor:pointer;">
+            <span>لا يوجد حد لدونة (No Plastic Limit)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--input-bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;transition:all 0.2s;" id="npTypeLabel3">
+            <input type="checkbox" id="npChk_npSoil" onchange="updateNPDeclaration();autoSave()" style="width:16px;height:16px;cursor:pointer;">
+            <span>تربة غير لدنة كلياً (Nonplastic Soil — NP)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Reason -->
+      <div class="field-group" style="margin-bottom:18px;">
+        <label class="field-label" style="font-size:13px;">سبب الإعلان — Reason for Declaration <span class="required-star">*</span></label>
+        <textarea id="npReason" rows="3" oninput="updateNPDeclaration();autoSave()" placeholder="مثال: التربة رملية خشنة لا تُظهر خصائص اللدونة. لم يمكن تشكيلها في حالة بلاستيكية عند أي محتوى مائي."
+          style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;font-family:inherit;background:var(--input-bg);color:var(--text);resize:vertical;"></textarea>
+      </div>
+
+      <!-- Official NP Declaration Box -->
+      <div style="margin-bottom:18px;">
+        <div class="field-label" style="margin-bottom:8px;font-size:13px;">نص الإعلان الرسمي — Official Declaration Text</div>
+        <div id="npDeclarationBox" style="
+          background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%);
+          border: 2.5px solid var(--danger);
+          border-radius: 10px;
+          padding: 20px 24px;
+          position: relative;
+          min-height: 100px;
+        ">
+          <div style="position:absolute;top:-12px;right:20px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 12px;border-radius:20px;letter-spacing:1px;">ASTM D4318</div>
+          <div id="npDeclarationText" style="
+            font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #7f1d1d;
+            line-height: 1.8;
+            text-align: center;
+            direction: rtl;
+          ">— اختر نوع الإعلان أعلاه —</div>
+          <div id="npDeclarationTextEn" style="
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            line-height: 1.6;
+            text-align: center;
+            margin-top: 8px;
+            direction: ltr;
+          "></div>
+        </div>
+      </div>
+
+      <!-- Technician signing the NP declaration -->
+      <div class="form-grid form-grid-2" style="margin-top:8px;">
+        <div class="field-group">
+          <label class="field-label">اسم الفني — Technician Name</label>
+          <input class="form-control" id="npTechName" type="text" oninput="updateNPDeclaration()" placeholder="يُملأ تلقائياً من بيانات الفني">
+        </div>
+        <div class="field-group">
+          <label class="field-label">تاريخ الإعلان — Declaration Date</label>
+          <input class="form-control" id="npDate" type="date" oninput="updateNPDeclaration()">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Notice card -->
+  <div class="section-card" style="border-color:var(--warning);">
+    <div class="section-header" style="background:#92400e;">
+      <span class="section-icon">📋</span>
+      <span>تأثير على التقرير النهائي — Effect on Final Report</span>
+    </div>
+    <div class="section-body" style="font-size:13px;line-height:1.8;color:var(--text);">
+      <ul style="padding-right:20px;">
+        <li>سيظهر إعلان "غير لدن (NP)" بخط كبير وواضح في قسم النتائج بالتقرير النهائي.</li>
+        <li>ستُشار قيم LL و PL و PI بـ <strong>NP</strong> بدلاً من الأرقام.</li>
+        <li>سيُضاف سبب الإعلان في خانة الملاحظات.</li>
+        <li>التصنيف USCS سيُسجَّل كـ <strong>ML / SM / SP</strong> حسب نوع التربة أو يُترك للفني.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      TAB 4 — PLASTIC LIMIT DATA
      ============================================================ -->
 <div class="tab-panel" id="tab-4">
@@ -2026,6 +2165,13 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
       <div class="rpt-section-title">5. TEST RESULTS SUMMARY</div>
     </div>
     <div class="rpt-results-box">
+      <!-- NP DECLARATION BANNER — shown only when NP is declared -->
+      <div id="rpt_npBanner" style="display:none;border:2.5px solid #dc2626;border-radius:6px;background:linear-gradient(135deg,#fff5f5,#fef2f2);margin-bottom:8px;padding:12px 16px;text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#7f1d1d;letter-spacing:1px;margin-bottom:4px;">NON-PLASTIC DECLARATION — ASTM D4318 §3.1.8</div>
+        <div id="rpt_npBannerText" style="font-size:14px;font-weight:800;color:#dc2626;font-family:Arial,sans-serif;letter-spacing:0.5px;line-height:1.5;"></div>
+        <div id="rpt_npBannerReason" style="font-size:8px;color:#7f1d1d;margin-top:4px;font-style:italic;"></div>
+        <div id="rpt_npBannerTech" style="font-size:8px;color:#991b1b;margin-top:3px;"></div>
+      </div>
       <div class="rpt-results-grid">
         <div class="rpt-result-cell">
           <div class="r-lbl">Liquid Limit (LL)</div>
@@ -2132,6 +2278,7 @@ const i18n = {
     tab3: 'حد السيولة LL',
     tab4: 'حد اللدونة PL',
     tab5: 'التقرير النهائي ★',
+    tab35: 'إعلان غير لدن NP',
     sec_project: 'معلومات المشروع والعينة — Project & Sample Information',
     lbl_projName: 'اسم المشروع',
     lbl_reportNum: 'رقم التقرير',
@@ -2221,6 +2368,7 @@ const i18n = {
     tab3: 'Liquid Limit LL',
     tab4: 'Plastic Limit PL',
     tab5: 'Final Report ★',
+    tab35: 'Non-Plastic (NP)',
     sec_project: 'Project & Sample Information',
     lbl_projName: 'Project Name',
     lbl_reportNum: 'Report Number',
@@ -2371,16 +2519,18 @@ function switchTab(n) {
 
   // Show selected
   const panelId = n === 5 ? 'tab-report' : `tab-${n}`;
-  document.getElementById(panelId).classList.add('active');
-  document.getElementById(`tabBtn${n}`).classList.add('active');
+  document.getElementById(panelId)?.classList.add('active');
+  document.getElementById(`tabBtn${n}`)?.classList.add('active');
 
-  // Progress
-  document.getElementById('progressFill').style.width = (n * 20) + '%';
+  // Progress — tab 35 counts as 3.5/5
+  const progressMap = { 1:20, 2:40, 3:55, 35:60, 4:75, 5:100 };
+  document.getElementById('progressFill').style.width = (progressMap[n] || 20) + '%';
 
   // Render charts when switching to relevant tabs
-  if (n === 3) { setTimeout(() => renderFlowChart3(), 150); }
-  if (n === 4) { setTimeout(() => renderPlasticityChart4(), 150); }
-  if (n === 5) { updateReport(); }
+  if (n === 3)  { setTimeout(() => renderFlowChart3(), 150); }
+  if (n === 4)  { setTimeout(() => renderPlasticityChart4(), 150); }
+  if (n === 5)  { updateReport(); }
+  if (n === 35) { syncNPTechName(); }
 }
 
 /* ==============================================================
@@ -2661,6 +2811,101 @@ function logRegressionAt25(points) {
   const b = (n * sumXY - sumX * sumY) / denom;
   const a = (sumY - b * sumX) / n;
   return a + b * Math.log(25);
+}
+
+/* ==============================================================
+   NP DECLARATION — Non-Plastic / Non-Liquid
+   ============================================================== */
+function syncNPTechName() {
+  const techEl = document.getElementById('techName');
+  const npTech = document.getElementById('npTechName');
+  if (npTech && techEl && !npTech.value) {
+    npTech.value = techEl.value || '';
+  }
+  if (!document.getElementById('npDate').value) {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('npDate').value = today;
+  }
+}
+
+function updateNPDeclaration() {
+  const noLL   = document.getElementById('npChk_noLL')?.checked;
+  const noPL   = document.getElementById('npChk_noPL')?.checked;
+  const npSoil = document.getElementById('npChk_npSoil')?.checked;
+  const reason = document.getElementById('npReason')?.value?.trim() || '';
+
+  // Update checkbox label highlight
+  ['npTypeLabel1','npTypeLabel2','npTypeLabel3'].forEach((id, i) => {
+    const checks = [noLL, noPL, npSoil];
+    const el = document.getElementById(id);
+    if (el) {
+      if (checks[i]) {
+        el.style.borderColor = 'var(--danger)';
+        el.style.background = '#fff5f5';
+        el.style.color = '#7f1d1d';
+      } else {
+        el.style.borderColor = 'var(--border)';
+        el.style.background = 'var(--input-bg)';
+        el.style.color = 'var(--text)';
+      }
+    }
+  });
+
+  const textEl   = document.getElementById('npDeclarationText');
+  const textEnEl = document.getElementById('npDeclarationTextEn');
+  if (!textEl) return;
+
+  if (!noLL && !noPL && !npSoil) {
+    textEl.textContent = '— اختر نوع الإعلان أعلاه —';
+    textEnEl.textContent = '';
+    if (textEl) {
+      textEl.style.color = '#9ca3af';
+      textEl.style.fontSize = '14px';
+    }
+    updateReport();
+    return;
+  }
+
+  // Build Arabic declaration
+  let arLines = [];
+  let enLines = [];
+
+  if (npSoil) {
+    arLines.push('تُعلن هذه العينة غير لدنة (NONPLASTIC — NP)');
+    enLines.push('This sample is declared NONPLASTIC (NP)');
+  }
+  if (noLL && !npSoil) {
+    arLines.push('لا يمكن تحديد حد السيولة لهذه العينة');
+    enLines.push('Liquid Limit (LL) cannot be determined for this sample');
+  }
+  if (noPL && !npSoil) {
+    arLines.push('لا يمكن تحديد حد اللدونة لهذه العينة');
+    enLines.push('Plastic Limit (PL) cannot be determined for this sample');
+  }
+
+  arLines.push('وفق المواصفة ASTM D4318');
+  enLines.push('Per ASTM D4318 Standard');
+
+  textEl.innerHTML = arLines.join('<br>');
+  textEl.style.color = '#7f1d1d';
+  textEl.style.fontSize = '16px';
+  textEnEl.innerHTML = enLines.join('<br>');
+
+  updateReport();
+}
+
+function getNPDeclarationData() {
+  return {
+    noLL:   document.getElementById('npChk_noLL')?.checked   || false,
+    noPL:   document.getElementById('npChk_noPL')?.checked   || false,
+    npSoil: document.getElementById('npChk_npSoil')?.checked || false,
+    reason: document.getElementById('npReason')?.value?.trim() || '',
+    techName: document.getElementById('npTechName')?.value?.trim() || '',
+    date:   document.getElementById('npDate')?.value || '',
+    active: (document.getElementById('npChk_noLL')?.checked ||
+             document.getElementById('npChk_noPL')?.checked ||
+             document.getElementById('npChk_npSoil')?.checked) || false,
+  };
 }
 
 /* ==============================================================
@@ -3394,8 +3639,46 @@ function updateReport() {
   // LL Method
   setText('rpt_llMethod', llMethod === 'A' ? 'Method A — Multipoint' : 'Method B — One-Point');
 
-  // Remarks
-  setText('rpt_remarks', document.getElementById('remarks')?.value || '');
+  // NP Declaration Banner
+  const npData = getNPDeclarationData();
+  const npBanner = document.getElementById('rpt_npBanner');
+  if (npBanner) {
+    if (npData.active) {
+      npBanner.style.display = 'block';
+      // Build report banner text
+      let bannerLines = [];
+      if (npData.npSoil) bannerLines.push('NONPLASTIC SOIL (NP)');
+      if (npData.noLL && !npData.npSoil) bannerLines.push('LIQUID LIMIT (LL): NOT DETERMINED');
+      if (npData.noPL && !npData.npSoil) bannerLines.push('PLASTIC LIMIT (PL): NOT DETERMINED');
+      bannerLines.push('Per ASTM D4318 §3.1.8');
+      setText('rpt_npBannerText', bannerLines.join('  •  '));
+      setText('rpt_npBannerReason', npData.reason ? `Reason: ${npData.reason}` : '');
+      const techStr = [
+        npData.techName ? `Declared by: ${npData.techName}` : '',
+        npData.date     ? `Date: ${npData.date}` : ''
+      ].filter(Boolean).join('   |   ');
+      setText('rpt_npBannerTech', techStr);
+      // Override result cells with NP
+      if (npData.npSoil || npData.noLL)  setText('rpt_LL', 'NP');
+      if (npData.npSoil || npData.noPL)  setText('rpt_PL', 'NP');
+      if (npData.npSoil || (npData.noLL && npData.noPL)) {
+        setText('rpt_PI', 'NP');
+        setCheck('rpt_chkNP_yes', true);
+        setCheck('rpt_chkNP_no',  false);
+      }
+    } else {
+      npBanner.style.display = 'none';
+    }
+  }
+
+  // Remarks — include NP reason if declared
+  let remarksText = document.getElementById('remarks')?.value || '';
+  if (npData.active && npData.reason && !remarksText.includes(npData.reason)) {
+    remarksText = remarksText
+      ? `${remarksText}\n[NP Declaration] ${npData.reason}`
+      : `[Non-Plastic Declaration] ${npData.reason}`;
+  }
+  setText('rpt_remarks', remarksText);
 
   // Signatures
   setText('rpt_sigTech', document.getElementById('techName')?.value || '—');
@@ -3660,6 +3943,17 @@ function resetAll() {
   const flatRadio = document.querySelector('input[name="grooving"][value="Flat"]');
   if (flatRadio) flatRadio.checked = true;
 
+  // Reset NP declaration
+  ['npChk_noLL','npChk_noPL','npChk_npSoil'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+  const npReason = document.getElementById('npReason');
+  if (npReason) npReason.value = '';
+  const npTech = document.getElementById('npTechName');
+  if (npTech) npTech.value = '';
+  updateNPDeclaration();
+
   // Rebuild LL table
   llRowCount = 4;
   buildLLTable();
@@ -3792,6 +4086,8 @@ function autoSave() {
   document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
     if (el.type === 'radio') {
       if (el.checked) data[el.name + '_radio'] = el.value;
+    } else if (el.type === 'checkbox') {
+      data[el.id] = el.checked;
     } else {
       data[el.id] = el.value;
     }
@@ -3813,6 +4109,8 @@ function autoRestore() {
   document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
     if (el.type === 'radio') {
       if (data[el.name + '_radio'] === el.value) el.checked = true;
+    } else if (el.type === 'checkbox') {
+      if (data[el.id] !== undefined) el.checked = data[el.id];
     } else if (data[el.id] !== undefined) {
       el.value = data[el.id];
     }
@@ -3820,6 +4118,7 @@ function autoRestore() {
 
   for (let i = 1; i <= llRowCount; i++) calcLLRow(i);
   calcPL();
+  updateNPDeclaration();
 
   // Re-validate fields after restore
   const _cup  = document.getElementById('cupWeight');
