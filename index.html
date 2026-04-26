@@ -6,6 +6,7 @@
 <title>Atterberg Limits Test Report — ASTM D4318</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" crossorigin="anonymous"></script>
 <style>
 /* ============================================================
    GLOBAL RESET & BASE STYLES
@@ -1366,10 +1367,13 @@ input.cal-warn-input    { border-color: #f59e0b !important; background: #fffbeb 
     <button class="btn btn-guide" onclick="showUserGuide()" title="دليل المستخدم">📖 <span data-i18n="btnGuide">دليل</span></button>
     <!-- Lock Results -->
     <button class="btn btn-lock" id="btnLock" onclick="toggleLock()" data-i18n="btnLock">🔓 قفل النتائج</button>
-    <!-- Save Results -->
-    <button class="btn btn-save" onclick="saveResults()" data-i18n="btnSave">💾 حفظ النتائج</button>
-    <!-- CSV Export -->
-    <button class="btn" onclick="exportCSV()" style="background:#0891b2;color:#fff;" title="Export CSV">📥 CSV</button>
+    <!-- Save Results JSON -->
+    <button class="btn btn-save" onclick="saveResults()" data-i18n="btnSave">💾 حفظ البيانات (JSON)</button>
+    <!-- Import JSON -->
+    <button class="btn" onclick="importJSON()" style="background:#7c3aed;color:#fff;" title="استيراد بيانات محفوظة">📂 استيراد بيانات محفوظة</button>
+    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="handleImportFile(event)">
+    <!-- Excel Export -->
+    <button class="btn" onclick="exportExcel()" style="background:#16a34a;color:#fff;" title="تصدير Excel">📊 تصدير Excel</button>
     <!-- Toolbar -->
     <button class="btn btn-demo" onclick="fillDemoData()" data-i18n="btnDemo">📋 بيانات تجريبية</button>
     <button class="btn btn-reset" onclick="resetAll()" data-i18n="btnReset">✕ إعادة تعيين</button>
@@ -2355,7 +2359,7 @@ const i18n = {
     btnLock: '🔓 قفل النتائج',
     btnUnlock: '🔒 فتح النتائج',
     btnGuide: 'دليل',
-    btnSave: '💾 حفظ النتائج',
+    btnSave: '💾 حفظ البيانات (JSON)',
   },
   en: {
     appTitle: 'Atterberg Limits Calculator — ASTM D4318',
@@ -2445,7 +2449,7 @@ const i18n = {
     btnLock: '🔓 Lock Results',
     btnUnlock: '🔒 Unlock Results',
     btnGuide: 'Guide',
-    btnSave: '💾 Save Results',
+    btnSave: '💾 Save Data (JSON)',
   }
 };
 
@@ -4710,6 +4714,828 @@ function showUserGuide() {
   // Close on backdrop click
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
+/* ==============================================================
+   IMPORT JSON — استيراد بيانات محفوظة
+   ============================================================== */
+function importJSON() {
+  document.getElementById('importFileInput').click();
+}
+
+function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      _applyImportedData(data);
+    } catch(err) {
+      alert(currentLang === 'ar'
+        ? '⛔ الملف غير صالح — تأكد أنه ملف JSON محفوظ من هذه المنصة'
+        : '⛔ Invalid file — make sure it is a JSON file saved from this platform');
+    }
+    // Reset input so same file can be re-imported if needed
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function _applyImportedData(data) {
+  // Unlock if locked
+  if (resultsLocked) {
+    resultsLocked = false;
+    document.getElementById('btnLock')?.classList.remove('locked');
+    document.getElementById('resultsSummary')?.classList.remove('locked');
+    document.querySelectorAll('input, textarea, select').forEach(el => { el.disabled = false; });
+  }
+
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) {
+      el.value = val;
+      el.dispatchEvent(new Event('input'));
+    }
+  };
+
+  // Project Info
+  const p = data.projectInfo || {};
+  set('projName',    p.projectName  || '');
+  set('reportNum',   p.reportNumber || '');
+  set('clientName',  p.client       || '');
+  set('reportDate',  p.reportDate   || '');
+  set('sampleId',    p.sampleId     || '');
+  set('sampleDate',  p.sampleDate   || '');
+  set('testDate',    p.testDate     || '');
+  if (p.prepMethod) {
+    const radio = document.querySelector(`input[name="prepMethod"][value="${p.prepMethod}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  // Environment
+  const env = data.environment || {};
+  set('temperature', env.temperature || '');
+  set('humidity',    env.humidity    || '');
+  set('testTime',    env.testTime    || '');
+  set('labRoom',     env.labRoom     || '');
+
+  // Equipment
+  const eq = data.equipment || {};
+  set('balanceId',  eq.balanceId  || '');
+  set('balanceCal', eq.balanceCal || '');
+  set('llDeviceId', eq.llDeviceId || '');
+  set('llDeviceCal',eq.llDeviceCal|| '');
+  set('grooveId',   eq.grooveId   || '');
+  set('ovenId',     eq.ovenId     || '');
+  set('cupWeight',  eq.cupWeight  || '');
+  set('dropHeight', eq.dropHeight || '');
+
+  // Personnel
+  const pe = data.personnel || {};
+  set('techName',    pe.techName  || '');
+  set('techId',      pe.techId    || '');
+  set('dept',        pe.dept      || '');
+  set('qmName',      pe.qmName   || '');
+  set('tmName',      pe.tmName   || '');
+
+  // LL Data
+  const llRows = data.llData || [];
+  if (llRows.length > 0) {
+    llRowCount = llRows.length;
+    buildLLTable();
+    llRows.forEach((row, idx) => {
+      const i = idx + 1;
+      set(`llN${i}`,    row.N    || '');
+      set(`llCid${i}`,  row.cid  || '');
+      set(`llWet${i}`,  row.wet  || '');
+      set(`llDry${i}`,  row.dry  || '');
+      set(`llTare${i}`, row.tare || '');
+      calcLLRow(i);
+    });
+  }
+
+  // PL Data
+  const pl = data.plData || {};
+  set('plC1', pl.c1 || ''); set('plC2', pl.c2 || '');
+  set('plW1', pl.w1 || ''); set('plW2', pl.w2 || '');
+  set('plD1', pl.d1 || ''); set('plD2', pl.d2 || '');
+  set('plT1', pl.t1 || ''); set('plT2', pl.t2 || '');
+  calcPL();
+
+  // LL Method
+  if (data.results?.llMethod?.includes('Method B') || data.results?.llMethod?.includes('One-Point')) {
+    setLLMethod('B');
+  } else {
+    setLLMethod('A');
+  }
+
+  // Remarks
+  set('remarks', data.remarks || '');
+
+  // Recalibrate validations
+  ['balanceCal','llDeviceCal','grooveCal','ovenCal'].forEach(id => {
+    const statusMap = { balanceCal:'balanceCalStatus', llDeviceCal:'llDevCalStatus', grooveCal:'grooveCalStatus', ovenCal:'ovenCalStatus' };
+    checkCalExpiry(id, statusMap[id]);
+  });
+  const cupEl  = document.getElementById('cupWeight');
+  const dropEl = document.getElementById('dropHeight');
+  const tempEl = document.getElementById('temperature');
+  const humEl  = document.getElementById('humidity');
+  if (cupEl?.value)  validateRangeField(cupEl,  185, 215, 'cupWeightMsg',  'astm_cup');
+  if (dropEl?.value) validateRangeField(dropEl, 9.8, 10.2,'dropHeightMsg', 'astm_drop');
+  if (tempEl?.value) validateEnvField(tempEl, 18, 28, 'temp');
+  if (humEl?.value)  validateEnvField(humEl,  25, 75, 'humidity');
+
+  updateReport();
+  setTimeout(() => { renderFlowChart3(); renderPlasticityChart4(); }, 300);
+  addAuditEntry('IMPORT', `Data imported from JSON file: ${data.projectInfo?.reportNumber || 'unknown'} | Saved at: ${data.meta?.savedAt || 'unknown'}`);
+
+  // Visual feedback
+  const btn = document.querySelector('[onclick="importJSON()"]');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✅ تم الاستيراد!';
+    btn.style.background = '#059669';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = '#7c3aed'; }, 2500);
+  }
+}
+
+/* ==============================================================
+   EXPORT EXCEL — تصدير Excel احترافي بـ ExcelJS
+   ============================================================== */
+async function exportExcel() {
+  if (typeof ExcelJS === 'undefined') {
+    alert(currentLang === 'ar'
+      ? '⛔ مكتبة ExcelJS غير محملة. تحقق من الاتصال بالإنترنت.'
+      : '⛔ ExcelJS library not loaded. Check your internet connection.');
+    return;
+  }
+
+  // ── Read all DOM data ──────────────────────────────────────
+  const projName   = document.getElementById('projName')?.value   || '—';
+  const reportNum  = document.getElementById('reportNum')?.value  || '—';
+  const clientName = document.getElementById('clientName')?.value || '—';
+  const reportDate = document.getElementById('reportDate')?.value || '—';
+  const sampleId   = document.getElementById('sampleId')?.value   || '—';
+  const sampleDate = document.getElementById('sampleDate')?.value || '—';
+  const testDate   = document.getElementById('testDate')?.value   || '—';
+  const prepMethod = document.querySelector('input[name="prepMethod"]:checked')?.value || '—';
+  const temperature= document.getElementById('temperature')?.value || '—';
+  const humidity   = document.getElementById('humidity')?.value   || '—';
+  const testTime   = document.getElementById('testTime')?.value   || '—';
+  const labRoom    = document.getElementById('labRoom')?.value    || '—';
+  const balanceId  = document.getElementById('balanceId')?.value  || '—';
+  const balanceCal = document.getElementById('balanceCal')?.value || '—';
+  const llDeviceId = document.getElementById('llDeviceId')?.value || '—';
+  const llDevCal   = document.getElementById('llDeviceCal')?.value|| '—';
+  const grooveId   = document.getElementById('grooveId')?.value   || '—';
+  const grooving   = document.querySelector('input[name="grooving"]:checked')?.value || '—';
+  const ovenId     = document.getElementById('ovenId')?.value     || '—';
+  const ovenCal    = document.getElementById('ovenCal')?.value    || '—';
+  const cupWeight  = document.getElementById('cupWeight')?.value  || '—';
+  const dropHeight = document.getElementById('dropHeight')?.value || '—';
+  const techName   = document.getElementById('techName')?.value   || '—';
+  const techId     = document.getElementById('techId')?.value     || '—';
+  const dept       = document.getElementById('dept')?.value       || '—';
+  const testingDate= document.getElementById('testingDate')?.value|| '—';
+  const qmName     = document.getElementById('qmName')?.value     || '—';
+  const tmName     = document.getElementById('tmName')?.value     || '—';
+  const remarks    = document.getElementById('remarks')?.value    || '—';
+
+  // LL data rows
+  const llRows = [];
+  for (let i = 1; i <= llRowCount; i++) {
+    llRows.push({
+      trial: i,
+      N:    document.getElementById(`llN${i}`)?.value    || '—',
+      cid:  document.getElementById(`llCid${i}`)?.value  || '—',
+      wet:  document.getElementById(`llWet${i}`)?.value  || '—',
+      dry:  document.getElementById(`llDry${i}`)?.value  || '—',
+      mw:   document.getElementById(`llMW${i}`)?.textContent?.trim() || '—',
+      tare: document.getElementById(`llTare${i}`)?.value || '—',
+      ds:   document.getElementById(`llDS${i}`)?.textContent?.trim()  || '—',
+      wc:   document.getElementById(`llWC${i}`)?.textContent?.trim()  || '—',
+    });
+  }
+
+  // PL data
+  const plC1   = document.getElementById('plC1')?.value    || '—';
+  const plC2   = document.getElementById('plC2')?.value    || '—';
+  const plW1   = document.getElementById('plW1')?.value    || '—';
+  const plW2   = document.getElementById('plW2')?.value    || '—';
+  const plD1   = document.getElementById('plD1')?.value    || '—';
+  const plD2   = document.getElementById('plD2')?.value    || '—';
+  const plT1   = document.getElementById('plT1')?.value    || '—';
+  const plT2   = document.getElementById('plT2')?.value    || '—';
+  const plMW1  = document.getElementById('plMW1')?.textContent?.trim()   || '—';
+  const plMW2  = document.getElementById('plMW2')?.textContent?.trim()   || '—';
+  const plMWavg= document.getElementById('plMWavg')?.textContent?.trim() || '—';
+  const plDS1  = document.getElementById('plDS1')?.textContent?.trim()   || '—';
+  const plDS2  = document.getElementById('plDS2')?.textContent?.trim()   || '—';
+  const plDSavg= document.getElementById('plDSavg')?.textContent?.trim() || '—';
+  const plWC1  = document.getElementById('plWC1')?.textContent?.trim()   || '—';
+  const plWC2  = document.getElementById('plWC2')?.textContent?.trim()   || '—';
+  const plWCavg= document.getElementById('plWCavg')?.textContent?.trim() || '—';
+
+  // Results
+  const rsLL    = document.getElementById('rsLL')?.textContent?.trim()    || document.getElementById('llResultDisplay')?.textContent?.trim() || '—';
+  const rsPL    = document.getElementById('rsPL')?.textContent?.trim()    || document.getElementById('plResultDisplay')?.textContent?.trim()  || '—';
+  const rsPI    = document.getElementById('rsPI')?.textContent?.trim()    || '—';
+  const rsClass = document.getElementById('rsClass')?.textContent?.trim() || '—';
+  const llMethodLabel = llMethod === 'A' ? 'Method A — Multipoint' : 'Method B — One-Point';
+
+  // ── Build Workbook ─────────────────────────────────────────
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'م. محمد أحمد القصبي — Mohamed Ahmed Elkasaby';
+  wb.created = new Date();
+  wb.modified = new Date();
+
+  const ws = wb.addWorksheet('Atterberg Limits D4318', {
+    pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1 },
+    views: [{ rightToLeft: false }]
+  });
+
+  // Column widths
+  ws.columns = [
+    { width: 6  },  // A
+    { width: 22 },  // B
+    { width: 22 },  // C
+    { width: 18 },  // D
+    { width: 18 },  // E
+    { width: 18 },  // F
+    { width: 18 },  // G
+    { width: 18 },  // H
+    { width: 18 },  // I
+    { width: 18 },  // J
+  ];
+
+  // ── Helper styles ──────────────────────────────────────────
+  const DARK   = { type:'pattern', pattern:'solid', fgColor:{argb:'FF1A3A5C'} };
+  const MED    = { type:'pattern', pattern:'solid', fgColor:{argb:'FF2D4A6B'} };
+  const ACCENT = { type:'pattern', pattern:'solid', fgColor:{argb:'FF0EA5E9'} };
+  const COMP   = { type:'pattern', pattern:'solid', fgColor:{argb:'FFE0F2FE'} };  // computed light blue
+  const LABEL  = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF1F5F9'} };  // label grey
+  const WARN   = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF3CD'} };  // avg row amber
+  const WHITE  = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFFFFF'} };
+
+  const WHITE_BOLD  = { bold:true, color:{argb:'FFFFFFFF'}, name:'Arial', size:10 };
+  const DARK_BOLD   = { bold:true, color:{argb:'FF1A3A5C'}, name:'Arial', size:10 };
+  const DARK_NORM   = { color:{argb:'FF1E293B'}, name:'Arial', size:9 };
+  const COMP_FONT   = { bold:true, color:{argb:'FF1D4ED8'}, name:'Arial', size:9 };
+  const SMALL_GREY  = { color:{argb:'FF64748B'}, name:'Arial', size:8 };
+
+  const ALL_BORDER = {
+    top:    { style:'thin', color:{argb:'FF94A3B8'} },
+    left:   { style:'thin', color:{argb:'FF94A3B8'} },
+    bottom: { style:'thin', color:{argb:'FF94A3B8'} },
+    right:  { style:'thin', color:{argb:'FF94A3B8'} },
+  };
+  const BOLD_BORDER = {
+    top:    { style:'medium', color:{argb:'FF1A3A5C'} },
+    left:   { style:'medium', color:{argb:'FF1A3A5C'} },
+    bottom: { style:'medium', color:{argb:'FF1A3A5C'} },
+    right:  { style:'medium', color:{argb:'FF1A3A5C'} },
+  };
+
+  const CENTER = { vertical:'middle', horizontal:'center', wrapText:true };
+  const LEFT   = { vertical:'middle', horizontal:'left',   wrapText:true };
+  const RIGHT  = { vertical:'middle', horizontal:'right',  wrapText:true };
+
+  function applyCell(row, col, value, font, fill, alignment, border) {
+    const cell = ws.getCell(row, col);
+    cell.value = value;
+    if (font)      cell.font       = font;
+    if (fill)      cell.fill       = fill;
+    if (alignment) cell.alignment  = alignment;
+    if (border)    cell.border     = border;
+  }
+
+  function sectionHeader(rowNum, title) {
+    ws.getRow(rowNum).height = 22;
+    ws.mergeCells(rowNum, 1, rowNum, 10);
+    applyCell(rowNum, 1, title, WHITE_BOLD, DARK, CENTER, BOLD_BORDER);
+  }
+
+  function infoRow(rowNum, pairs) {
+    // pairs: [{label, value}, {label, value}...] up to 4 pairs (B-C, D-E, F-G, H-I)
+    ws.getRow(rowNum).height = 20;
+    const cols = [[2,3],[4,5],[6,7],[8,9]];
+    pairs.forEach(({label, value}, idx) => {
+      if (!cols[idx]) return;
+      const [lc, vc] = cols[idx];
+      applyCell(rowNum, lc, label, {bold:true, name:'Arial', size:8.5, color:{argb:'FF334155'}}, LABEL, LEFT, ALL_BORDER);
+      applyCell(rowNum, vc, value, DARK_NORM, WHITE, LEFT, ALL_BORDER);
+    });
+    // Fill A and J
+    applyCell(rowNum, 1, '', null, WHITE, null, ALL_BORDER);
+    applyCell(rowNum,10, '', null, WHITE, null, ALL_BORDER);
+  }
+
+  let R = 1; // Current row
+
+  // ══════════════════════════════════════════════════════════
+  // TITLE BLOCK
+  // ══════════════════════════════════════════════════════════
+  ws.getRow(R).height = 30;
+  ws.mergeCells(R, 1, R, 10);
+  applyCell(R, 1,
+    'MATERIALS AND DESIGN LABORATORY — ATTERBERG LIMITS TEST REPORT — ASTM D4318',
+    { bold:true, size:13, color:{argb:'FFFFFFFF'}, name:'Arial' },
+    DARK, CENTER, BOLD_BORDER
+  );
+
+  R++;
+  ws.getRow(R).height = 16;
+  ws.mergeCells(R, 1, R, 10);
+  applyCell(R, 1,
+    `إعداد وتطوير: م / محمد أحمد القصبي  |  Mohamed Ahmed Elkasaby  |  Generated: ${new Date().toLocaleDateString('en-GB')}`,
+    { italic:true, size:8, color:{argb:'FF64748B'}, name:'Arial' },
+    { type:'pattern', pattern:'solid', fgColor:{argb:'FFF8FAFC'} },
+    CENTER, ALL_BORDER
+  );
+
+  R++; R++;  // blank spacer
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION 1 — PROJECT & SAMPLE INFO
+  // ══════════════════════════════════════════════════════════
+  sectionHeader(R, '1. PROJECT & SAMPLE INFORMATION — معلومات المشروع والعينة');
+  R++;
+  infoRow(R, [
+    { label: 'Project Name / اسم المشروع', value: projName },
+    { label: 'Report No. / رقم التقرير',   value: reportNum },
+    { label: 'Report Date / تاريخ التقرير', value: reportDate },
+  ]);
+  R++;
+  infoRow(R, [
+    { label: 'Client / العميل',  value: clientName },
+    { label: 'Sample ID',        value: sampleId   },
+    { label: 'Sample Date',      value: sampleDate },
+  ]);
+  R++;
+  infoRow(R, [
+    { label: 'Test Date',         value: testDate   },
+    { label: 'Preparation Method',value: prepMethod },
+    { label: 'Passing Sieve',     value: '#40 (0.425 mm) — ASTM D4318' },
+  ]);
+
+  R++; R++;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION 2 — ENVIRONMENT & EQUIPMENT
+  // ══════════════════════════════════════════════════════════
+  sectionHeader(R, '2. ENVIRONMENT & EQUIPMENT TRACEABILITY (ISO 17025) — البيئة والمعدات');
+  R++;
+  infoRow(R, [
+    { label: 'Temperature (°C)', value: temperature },
+    { label: 'Humidity (%RH)',   value: humidity    },
+    { label: 'Time of Test',     value: testTime    },
+    { label: 'Lab Room',         value: labRoom     },
+  ]);
+  R++;
+  infoRow(R, [
+    { label: 'Balance ID',        value: balanceId  },
+    { label: 'Balance Cal. Due',  value: balanceCal },
+    { label: 'LL Device ID',      value: llDeviceId },
+    { label: 'LL Device Cal. Due',value: llDevCal   },
+  ]);
+  R++;
+  infoRow(R, [
+    { label: 'Grooving Tool ID',  value: grooveId   },
+    { label: 'Grooving Type',     value: grooving   },
+    { label: 'Oven ID',           value: ovenId     },
+    { label: 'Oven Cal. Due',     value: ovenCal    },
+  ]);
+  R++;
+  infoRow(R, [
+    { label: 'Cup Weight (g) §6.1.3', value: cupWeight  },
+    { label: 'Drop Height (mm) §9.2', value: dropHeight },
+    { label: 'LL Method',             value: llMethodLabel },
+  ]);
+
+  R++; R++;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION 3 — PERSONNEL
+  // ══════════════════════════════════════════════════════════
+  sectionHeader(R, '3. PERSONNEL — بيانات الفنيين والمسؤولين');
+  R++;
+  infoRow(R, [
+    { label: 'Technician Name',      value: techName    },
+    { label: 'Tech. ID / Badge No.', value: techId      },
+    { label: 'Department',           value: dept        },
+    { label: 'Date of Testing',      value: testingDate },
+  ]);
+  R++;
+  infoRow(R, [
+    { label: 'Quality Manager',      value: qmName  },
+    { label: 'Technical Manager',    value: tmName  },
+  ]);
+
+  R++; R++;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION 4 — LIQUID LIMIT DATA TABLE
+  // ══════════════════════════════════════════════════════════
+  sectionHeader(R, '4. LIQUID LIMIT (LL) DATA TABLE — جدول بيانات حد السيولة');
+  R++;
+
+  // Table header row
+  ws.getRow(R).height = 30;
+  const llHeaders = [
+    'Trial\nرقم التجربة',
+    'No. of Blows (N)\nعدد الضربات',
+    'Container ID\nرقم الحاوية',
+    'Wet Soil + Container (g)\nوزن رطب + علبة',
+    'Dry Soil + Container (g)\nوزن جاف + علبة',
+    'Mass of Water (g)\nوزن الماء',
+    'Container Tare (g)\nوزن العلبة',
+    'Dry Soil (g)\nالتربة الجافة',
+    'Water Content (%)\nمحتوى الرطوبة',
+  ];
+  llHeaders.forEach((h, i) => {
+    applyCell(R, i+2, h,
+      { bold:true, size:8, color:{argb:'FFFFFFFF'}, name:'Arial', wrapText:true },
+      MED, CENTER, BOLD_BORDER
+    );
+  });
+  applyCell(R, 1, '', null, MED, null, BOLD_BORDER);
+
+  R++;
+  // LL data rows
+  llRows.forEach(row => {
+    ws.getRow(R).height = 22;
+    const isComputed = (v) => v !== '—' && v !== '';
+
+    applyCell(R, 1,  '',         null,      WHITE, null, ALL_BORDER);
+    applyCell(R, 2,  row.trial,  DARK_BOLD, LABEL, CENTER, ALL_BORDER);
+    applyCell(R, 3,  row.N,      DARK_NORM, WHITE, CENTER, ALL_BORDER);
+    applyCell(R, 4,  row.cid,    DARK_NORM, WHITE, CENTER, ALL_BORDER);
+    applyCell(R, 5,  row.wet,    DARK_NORM, WHITE, CENTER, ALL_BORDER);
+    applyCell(R, 6,  row.dry,    DARK_NORM, WHITE, CENTER, ALL_BORDER);
+    applyCell(R, 7,  row.mw,     COMP_FONT, COMP,  CENTER, ALL_BORDER);
+    applyCell(R, 8,  row.tare,   DARK_NORM, WHITE, CENTER, ALL_BORDER);
+    applyCell(R, 9,  row.ds,     COMP_FONT, COMP,  CENTER, ALL_BORDER);
+    applyCell(R, 10, row.wc,     COMP_FONT, COMP,  CENTER, ALL_BORDER);
+    R++;
+  });
+
+  R++; R++;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION 5 — PLASTIC LIMIT DATA TABLE
+  // ══════════════════════════════════════════════════════════
+  sectionHeader(R, '5. PLASTIC LIMIT (PL) DATA TABLE — جدول بيانات حد اللدونة');
+  R++;
+
+  // PL table header
+  ws.getRow(R).height = 28;
+  const plColHeaders = ['Parameter / المعامل', 'Trial 1 / التجربة 1', 'Trial 2 / التجربة 2', 'Average / المتوسط'];
+  plColHeaders.forEach((h, i) => {
+    applyCell(R, i*2+2, h,
+      { bold:true, size:8.5, color:{argb:'FFFFFFFF'}, name:'Arial' },
+      MED, CENTER, BOLD_BORDER
+    );
+    // Merge each header over 2 columns
+    if (i < 3) {
+      ws.mergeCells(R, i*2+2, R, i*2+3);
+    }
+  });
+  // Last avg column single
+  ws.mergeCells(R, 8, R, 10);
+  applyCell(R, 8, 'Average / المتوسط',
+    { bold:true, size:8.5, color:{argb:'FFFFFFFF'}, name:'Arial' },
+    MED, CENTER, BOLD_BORDER
+  );
+  applyCell(R, 1, '', null, MED, null, BOLD_BORDER);
+
+  R++;
+
+  // PL rows definition: [label, v1, v2, avg, isComputed]
+  const plTableRows = [
+    ['Container ID / رقم الحاوية',             plC1,  plC2,  '—',    false],
+    ['Wet Soil + Container (g) / وزن رطب+علبة', plW1,  plW2,  '—',    false],
+    ['Dry Soil + Container (g) / وزن جاف+علبة', plD1,  plD2,  '—',    false],
+    ['Mass of Water (g) / وزن الماء',            plMW1, plMW2, plMWavg,true],
+    ['Container Tare (g) / وزن العلبة',          plT1,  plT2,  '—',    false],
+    ['Dry Soil (g) / التربة الجافة',             plDS1, plDS2, plDSavg,true],
+    ['Water Content (%) / محتوى الرطوبة',        plWC1, plWC2, plWCavg,true],
+  ];
+
+  plTableRows.forEach(([lbl, v1, v2, avg, isComp], idx) => {
+    ws.getRow(R).height = 20;
+    const isAvgRow = idx === plTableRows.length - 1; // last row
+    const rowFill  = isAvgRow ? WARN : (isComp ? COMP : WHITE);
+    const vFont    = isComp ? COMP_FONT : DARK_NORM;
+    const avgFont  = isAvgRow ? { bold:true, size:10, color:{argb:'FF1A3A5C'}, name:'Arial' } : COMP_FONT;
+
+    applyCell(R, 1, '', null, LABEL, null, ALL_BORDER);
+
+    // Label cell (B-C merged)
+    ws.mergeCells(R, 2, R, 3);
+    applyCell(R, 2, lbl, { bold:true, size:8.5, name:'Arial', color:{argb:'FF334155'} }, LABEL, LEFT, ALL_BORDER);
+
+    // Trial 1 (D-E merged)
+    ws.mergeCells(R, 4, R, 5);
+    applyCell(R, 4, v1, vFont, rowFill, CENTER, ALL_BORDER);
+
+    // Trial 2 (F-G merged)
+    ws.mergeCells(R, 6, R, 7);
+    applyCell(R, 6, v2, vFont, rowFill, CENTER, ALL_BORDER);
+
+    // Average (H-J merged)
+    ws.mergeCells(R, 8, R, 10);
+    applyCell(R, 8, avg, avgFont, isAvgRow ? WARN : COMP, CENTER, ALL_BORDER);
+
+    R++;
+  });
+
+  R++; R++;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION 6 — RESULTS SUMMARY
+  // ══════════════════════════════════════════════════════════
+  sectionHeader(R, '6. TEST RESULTS SUMMARY — ملخص النتائج (ASTM D4318 §20.4)');
+  R++;
+
+  // Results sub-headers
+  ws.getRow(R).height = 26;
+  const resLabels = ['Liquid Limit (LL)', 'Plastic Limit (PL)', 'Plasticity Index (PI)', 'USCS Classification', 'LL Method'];
+  const resValues = [rsLL + ' %', rsPL + ' %', rsPI + ' %', rsClass, llMethodLabel];
+
+  const colRanges = [[2,3],[4,5],[6,7],[8,8],[9,10]];
+  resLabels.forEach((lbl, i) => {
+    const [c1, c2] = colRanges[i];
+    ws.mergeCells(R, c1, R, c2);
+    applyCell(R, c1, lbl, { bold:true, size:8, color:{argb:'FFFFFFFF'}, name:'Arial' }, ACCENT, CENTER, BOLD_BORDER);
+  });
+  applyCell(R, 1, '', null, ACCENT, null, BOLD_BORDER);
+
+  R++;
+  ws.getRow(R).height = 32;
+  resValues.forEach((val, i) => {
+    const [c1, c2] = colRanges[i];
+    ws.mergeCells(R, c1, R, c2);
+    applyCell(R, c1, val,
+      { bold:true, size:14, color:{argb:'FF1A3A5C'}, name:'Arial' },
+      COMP, CENTER, BOLD_BORDER
+    );
+  });
+  applyCell(R, 1, '', null, COMP, null, BOLD_BORDER);
+
+  R++; R++;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTIONS 7 & 8 — CHARTS then REMARKS & SIGNATURES
+  // (built below using offscreen canvas approach)
+  // ══════════════════════════════════════════════════════════
+
+  // Helper: render a chart on a temporary offscreen canvas and return base64 PNG
+
+  // ── Render charts to offscreen canvases and capture PNG ──────
+  // This works regardless of which tab is active.
+  async function _renderChartOffscreen(builderFn, width, height) {
+    const canvas = document.createElement('canvas');
+    canvas.width  = width  * 2; // 2× for sharp export
+    canvas.height = height * 2;
+    canvas.style.display = 'none';
+    document.body.appendChild(canvas);
+    try {
+      const instance = builderFn(canvas);
+      // Wait one animation frame for Chart.js to paint
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      instance.resize();
+      instance.render();
+      const dataUrl = canvas.toDataURL('image/png');
+      instance.destroy();
+      return dataUrl.split(',')[1] || null;
+    } catch(e) {
+      return null;
+    } finally {
+      document.body.removeChild(canvas);
+    }
+  }
+
+  // Build offscreen Flow Curve chart using existing buildFlowChart()
+  const llPoints = getLLData();
+  let flowPng = null;
+  if (llPoints.length >= 2) {
+    flowPng = await _renderChartOffscreen(
+      (canvas) => buildFlowChart(canvas, llPoints, true),
+      900, 420
+    );
+  }
+
+  // Build offscreen Plasticity chart using existing buildPlasticityChart()
+  const llValChart = calcLL();
+  const plValChart = getPLValue();
+  let plasticityPng = null;
+  if (llValChart !== null && plValChart !== null) {
+    plasticityPng = await _renderChartOffscreen(
+      (canvas) => buildPlasticityChart(canvas, llValChart, plValChart, true),
+      900, 420
+    );
+  }
+
+  // ── Add charts BELOW results on the SAME worksheet ───────────
+  // Use simple non-merged rows for image label (no merge = no conflict)
+  R++; // spacer
+
+  // Section 7 header — direct cell write, no merge needed for spacer rows
+  // We write section title using a plain cell row (R is fresh, no prior merge)
+  ws.getRow(R).height = 22;
+  ws.mergeCells(R, 1, R, 10);
+  {
+    const sc = ws.getCell(R, 1);
+    sc.value = '7. CHARTS — الرسوم البيانية (Flow Curve + Plasticity Chart)';
+    sc.font  = WHITE_BOLD;
+    sc.fill  = DARK;
+    sc.alignment = CENTER;
+    sc.border = BOLD_BORDER;
+  }
+  R++;
+
+  // ── Flow Curve ──────────────────────────────────────────────
+  ws.getRow(R).height = 16;
+  ws.mergeCells(R, 1, R, 10);
+  {
+    const lc = ws.getCell(R, 1);
+    lc.value = 'Flow Curve — Water Content (%) vs. Number of Blows N (Log Scale)';
+    lc.font  = { bold:true, size:9, color:{argb:'FF1A3A5C'}, name:'Arial' };
+    lc.fill  = { type:'pattern', pattern:'solid', fgColor:{argb:'FFE0F2FE'} };
+    lc.alignment = CENTER;
+    lc.border = ALL_BORDER;
+  }
+  R++;
+
+  if (flowPng) {
+    const flowImgId = wb.addImage({ base64: flowPng, extension: 'png' });
+    const flowSpan  = 24; // rows × ~18px ≈ 432px height in Excel
+    for (let rr = R; rr < R + flowSpan; rr++) ws.getRow(rr).height = 18;
+    ws.addImage(flowImgId, {
+      tl: { col: 0,  row: R - 1 },
+      br: { col: 10, row: R - 1 + flowSpan },
+      editAs: 'oneCell',
+    });
+    R += flowSpan;
+  } else {
+    ws.getRow(R).height = 18;
+    ws.mergeCells(R, 1, R, 10);
+    const wc = ws.getCell(R, 1);
+    wc.value = '⚠ Flow Curve not available — need at least 2 LL data points';
+    wc.font  = { italic:true, size:9, color:{argb:'FFB45309'}, name:'Arial' };
+    wc.fill  = WARN;
+    wc.alignment = CENTER;
+    wc.border = ALL_BORDER;
+    R++;
+  }
+
+  R += 2; // spacer
+
+  // ── Plasticity Chart ─────────────────────────────────────────
+  ws.getRow(R).height = 16;
+  ws.mergeCells(R, 1, R, 10);
+  {
+    const lc2 = ws.getCell(R, 1);
+    lc2.value = 'Plasticity Chart (USCS — Casagrande) — PI vs. LL';
+    lc2.font  = { bold:true, size:9, color:{argb:'FF1A3A5C'}, name:'Arial' };
+    lc2.fill  = { type:'pattern', pattern:'solid', fgColor:{argb:'FFE0F2FE'} };
+    lc2.alignment = CENTER;
+    lc2.border = ALL_BORDER;
+  }
+  R++;
+
+  if (plasticityPng) {
+    const plastImgId = wb.addImage({ base64: plasticityPng, extension: 'png' });
+    const plastSpan  = 24;
+    for (let rr = R; rr < R + plastSpan; rr++) ws.getRow(rr).height = 18;
+    ws.addImage(plastImgId, {
+      tl: { col: 0,  row: R - 1 },
+      br: { col: 10, row: R - 1 + plastSpan },
+      editAs: 'oneCell',
+    });
+    R += plastSpan;
+  } else {
+    ws.getRow(R).height = 18;
+    ws.mergeCells(R, 1, R, 10);
+    const wc2 = ws.getCell(R, 1);
+    wc2.value = '⚠ Plasticity Chart not available — need LL and PL data';
+    wc2.font  = { italic:true, size:9, color:{argb:'FFB45309'}, name:'Arial' };
+    wc2.fill  = WARN;
+    wc2.alignment = CENTER;
+    wc2.border = ALL_BORDER;
+    R++;
+  }
+
+  R += 2;
+
+  // ── Section 8: REMARKS & SIGNATURES ─────────────────────────
+  ws.getRow(R).height = 22;
+  ws.mergeCells(R, 1, R, 10);
+  {
+    const sh = ws.getCell(R, 1);
+    sh.value = '8. REMARKS & SIGNATURES — ملاحظات والتوقيعات';
+    sh.font  = WHITE_BOLD;
+    sh.fill  = DARK;
+    sh.alignment = CENTER;
+    sh.border = BOLD_BORDER;
+  }
+  R++;
+
+  // Remarks
+  ws.getRow(R).height = 40;
+  ws.mergeCells(R, 2, R, 10);
+  {
+    const rc = ws.getCell(R, 2);
+    rc.value = remarks;
+    rc.font  = { size:9, name:'Arial', color:{argb:'FF1E293B'} };
+    rc.fill  = WHITE;
+    rc.alignment = LEFT;
+    rc.border = ALL_BORDER;
+  }
+  {
+    const rl = ws.getCell(R, 1);
+    rl.value = 'Remarks:';
+    rl.font  = { bold:true, size:8.5, name:'Arial', color:{argb:'FF334155'} };
+    rl.fill  = LABEL;
+    rl.alignment = CENTER;
+    rl.border = ALL_BORDER;
+  }
+  R++; R++;
+
+  // Signature Block — 3 columns
+  ws.getRow(R).height = 20;
+  ws.mergeCells(R, 2, R, 4);
+  ws.mergeCells(R, 5, R, 7);
+  ws.mergeCells(R, 8, R, 10);
+  ['TECHNICIAN / LAB STAFF', 'QUALITY MANAGER', 'TECHNICAL MANAGER'].forEach((title, i) => {
+    const c = ws.getCell(R, [2,5,8][i]);
+    c.value = title;
+    c.font  = { bold:true, size:8.5, color:{argb:'FFFFFFFF'}, name:'Arial' };
+    c.fill  = MED;
+    c.alignment = CENTER;
+    c.border = BOLD_BORDER;
+  });
+  ws.getCell(R, 1).fill = MED;
+  ws.getCell(R, 1).border = BOLD_BORDER;
+  R++;
+
+  const sigRows = [
+    ['Name:',       techName,    qmName,     tmName],
+    ['ID / Badge:', techId,      dept,       'ASTM Ref: D4318'],
+    ['Signature:',  ' ',         ' ',        ' '],
+    ['Date:',       testingDate, reportDate, reportDate],
+  ];
+  sigRows.forEach(([label, v1, v2, v3]) => {
+    ws.getRow(R).height = label === 'Signature:' ? 28 : 20;
+    const lc = ws.getCell(R, 1);
+    lc.value = label; lc.font = { bold:true, size:8, name:'Arial', color:{argb:'FF334155'} };
+    lc.fill = LABEL; lc.alignment = RIGHT; lc.border = ALL_BORDER;
+    ws.mergeCells(R, 2, R, 4);
+    const c1 = ws.getCell(R, 2); c1.value = v1; c1.font = DARK_NORM; c1.fill = WHITE; c1.alignment = LEFT; c1.border = ALL_BORDER;
+    ws.mergeCells(R, 5, R, 7);
+    const c2 = ws.getCell(R, 5); c2.value = v2; c2.font = DARK_NORM; c2.fill = WHITE; c2.alignment = LEFT; c2.border = ALL_BORDER;
+    ws.mergeCells(R, 8, R, 10);
+    const c3 = ws.getCell(R, 8); c3.value = v3; c3.font = DARK_NORM; c3.fill = WHITE; c3.alignment = LEFT; c3.border = ALL_BORDER;
+    R++;
+  });
+
+  R++;
+  // Footer
+  ws.getRow(R).height = 14;
+  ws.mergeCells(R, 1, R, 10);
+  {
+    const fc = ws.getCell(R, 1);
+    fc.value = `ELKASABY FOR MATERIALS AND DESIGN  |  ASTM D4318  |  ISO 17025  |  Generated: ${new Date().toLocaleString('en-GB')}`;
+    fc.font  = { italic:true, size:7.5, color:{argb:'FF94A3B8'}, name:'Arial' };
+    fc.fill  = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF8FAFC'} };
+    fc.alignment = CENTER;
+    fc.border = ALL_BORDER;
+  }
+
+  // ── Generate & Download ────────────────────────────────────
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const safeName = (projName || 'Atterberg').replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').slice(0, 25);
+  const filename = `ATT_${safeName}_${dateStr}.xlsx`;
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+
+  addAuditEntry('EXCEL EXPORT', `Exported to: ${filename} at ${new Date().toLocaleString('en-GB')}`);
+
+  const btn = document.querySelector('[onclick="exportExcel()"]');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✅ تم التصدير!';
+    setTimeout(() => { btn.textContent = orig; }, 2500);
+  }
+}
+
+/* End of Excel/Import functions */
 document.addEventListener('DOMContentLoaded', () => {
   buildLLTable();
   buildKFactorTable();
